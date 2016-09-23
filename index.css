@@ -4,59 +4,127 @@
 	border-width:0;
 	font-family: "微软雅黑";
 }
-html,body{
-	height:100%;
-	cursor:pointer;
+
+#game {
+	position: relative;
+	width:540px;
+	height:670px;
+	margin: 20px auto;
+	box-shadow: 0px 0px 10px #9B9B9B, 3px 4px 5px #A5A3A3;
+
+	background-color: #BABABA;
 
 }
-h1,h2,#contain,footer{
-	margin:0 auto;
-	text-align:center;
-	overflow:hidden;
-}
-footer{
-	font-size:20px;
-	color:red;
-}
-h1{
-	font-size:60px;
-}
-h2{
-	height:6%;
-}
-#start{
-	float:left;
-	display:block;
-	border-radius:10px;
-	height:100%;
-	background-color:#A9A9A9;
-	font-size:20px;
-}
-#scoreBlock{
-	float:right;
-	display:block;
-	border-radius:10px;
-	height:100%;
-	background-color:#A9A9A9;
-}
-#contain{
-	width:300px;
-	height:300px;
-	background-color:#808080;
-	border-radius: 10px;
-	margin-top:20px;
-	position:relative;
-}
-.min{
-	background-color:#A9A9A9;
-	border-radius:5px;
-	position:absolute;
-}
-.fs{
-	background-color:#F5DEB3;
-	border-radius:5px;
-	position:absolute;
-	font-size:25px;
+#model {
+	position: absolute;
+	left: 40px;
+	top: 2px;
 
-	font-weight:bold;
+	text-shadow: 0px 0px 10px #9B9B9B, 3px 4px 5px #A5A3A3;
+
+	font-size: 80px;
+	font-weight: bold;
+}
+
+#best, #score{
+	position: absolute;
+	top: 20px;
+	min-width: 80px;
+	height: 60px;
+
+	box-shadow: 0px 0px 10px #706F6F, 3px 3px 4px #696969;
+
+	background-color: #8C8989;
+
+	text-align: center;
+}
+#best{
+	right:20px;
+
+}
+#score{
+	right: 150px;
+}
+#maxScore,#myScore{
+	color:white;
+	font-size: 30px;
+	font-weight: bold;
+}
+p#info {
+	position: absolute;
+	top:100px;
+	left:20px;
+	width: 54%;
+	font-size: 20px;
+	color:grey;
+	text-shadow: 0px 0px 10px #9B9B9B, 3px 4px 5px #A5A3A3;
+}
+#view {
+	position: absolute;
+	top: 130px;
+	left: 10px;
+	width: 520px;
+	height: 520px;
+
+	box-shadow: 0px 0px 10px #383838,4px 4px 10px #383838;
+
+	background-color: #B6B5B5;
+}
+.cell {
+	position: absolute;
+
+	width: 110px;
+	height: 110px;
+	background-color: #CBCBCB;
+	box-shadow: 0px 0px 10px #383838, 4px 4px 10px #383838;
+
+	line-height: 110px;
+	text-align: center;
+	font-size: 80px;
+	color: #5F5F5F;
+}
+button{
+	display: inline-block;
+	position: absolute;
+	top: 90px;
+	min-width: 80px;
+	height: 30px;
+
+	border:none;
+	box-shadow: 0px 0px 10px #626262,4px 5px 4px #585858;
+	background-color: #8C8989;
+	background-repeat: no-repeat;
+}
+button#restart{
+	right:20px;
+}
+button#undo{
+	right: 120px;
+}
+
+@media screen and (max-width: 500px){
+	#model {
+		top: 20px;
+		left:10px;
+		font-size:60px;
+	}
+	#best{
+		right: 10px;
+	}
+	#score{
+		right: 110px;
+	}
+	P#info{
+		top: 80px;
+		left: 10px;
+	}
+	button#restart{
+		right:10px;
+	}
+	button#undo{
+		right:110px;
+	}
+	.con {
+		font-size: 60px;
+	}
 }
