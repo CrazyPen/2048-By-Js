@@ -83,6 +83,9 @@ p#info {
 	font-size: 80px;
 	color: #5F5F5F;
 }
+.con{
+	transition: all 2s;
+}
 button{
 	display: inline-block;
 	position: absolute;
