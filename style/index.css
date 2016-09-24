@@ -45,7 +45,7 @@
 
 }
 #score{
-	right: 150px;
+	right: 120px;
 }
 #maxScore,#myScore{
 	color:white;
@@ -96,12 +96,9 @@ p#info {
 	top: 150px;
 	font-size: 40px;
 }
-#over p#finalScore{
+#over #finalScore{
 	top: 200px;
 	font-size: 80px;
-}
-#over #finalScore{
-
 }
 #over #start {
 	top: 300px;
@@ -163,6 +160,23 @@ button#undo{
 	P#info{
 		top: 80px;
 		left: 10px;
+	}
+	#over p {
+		font-size: 40px;
+	}
+	#over #title {
+		top: 70px;
+	}
+	#over #scoreTitle {
+		top: 120px;
+		font-size: 30px;
+	}
+	#over #finalScore {
+		top: 150px;
+		font-size: 60px;
+	}
+	#over #start {
+		top: 220px;
 	}
 	button#restart{
 		right:10px;

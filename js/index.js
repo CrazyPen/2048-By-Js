@@ -25,7 +25,8 @@ for(var i=0;i<4;i++)
 
 //绘制方格
 setCss();
-	
+
+
 newGame();
 getBest();
 
@@ -174,6 +175,11 @@ function setCss()
 		document.querySelector("#game").style.height = clientWidth+125+"px";
 		view.style.width = clientWidth-20+"px";
 		view.style.height = clientWidth-20+"px";
+
+		var over = document.querySelector("#over");
+		over.style.width = clientWidth-20+"px";
+		over.style.height = clientWidth-20+"px";
+
 		cellWidth = (clientWidth-20)*0.2;
 		cellSpace = (clientWidth-20)*0.04;
 	}
