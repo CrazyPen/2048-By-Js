@@ -1,6 +1,9 @@
 var score=0;
+var undoScore = 0;
+var canUndo = false;
 var cellWidth = 110,
 	cellSpace = 16;
+var randomCell = {x:-1, y:-1};
 function cellData(){
 	this.lastY = -1;
 	this.lastX = -1;
@@ -25,10 +28,11 @@ for(var i=0;i<4;i++)
 
 //绘制方格
 setCss();
-
-
 newGame();
 getBest();
+document.querySelector("#restart").addEventListener("click",newGame);
+document.querySelector("#start").addEventListener("click", newGame);
+document.querySelector("#undo").addEventListener("click", undo);
 
 document.addEventListener("keydown",function(event){
 	if(event.which==37)
@@ -208,6 +212,7 @@ function getBest(){
 }
 function updateScore()
 {
+
 	document.querySelector("#myScore").textContent = score;
 }
 
@@ -232,7 +237,7 @@ function clearBoard()
 	var cons = document.querySelectorAll(".con");
 	if(cons.length>0){
 		for( var i=0,len=cons.length; i<len; i++){
-			cons[i].parentNode().removeChild(cons[i]);
+			cons[i].parentNode.removeChild(cons[i]);
 		}
 	}
 	
@@ -248,7 +253,6 @@ function clearBoard()
 
 function randomNumber()
 {
-	var view = document.querySelector("#view");
 	while(true)
 	{
 		var h=Math.floor(Math.random()*4);
@@ -259,27 +263,40 @@ function randomNumber()
 			board[h][l].value=(Math.random()>0.5?2:4);
 			board[h][l].lastX = board[h][l].nextX = l;
 			board[h][l].lastY = board[h][l].nextY = h;
-
-			var con = document.createElement("div");
-			con.setAttribute("class", "cell con");
-			con.setAttribute("id", "con-"+h+"-"+l);
-			con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
-			con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
-			con.style.width = cellWidth+"px";
-			con.style.height = cellWidth+"px";
-			con.style.lineHeight = cellWidth+"px";
-			con.style.backgroundColor = numberBgColor(board[h][l].value);
-			if(board[h][l].value>100 && board[h][l].value<1000){
-				con.style.fontSize = cellWidth>100?"60px":"40px";
-			}else if(board[h][l].value>1000){
-				con.style.fontSize = cellWidth>100?"40px":"20px";
-			}
-			con.textContent = board[h][l].value;
-			view.appendChild(con);
+			
+			showOneCell(h, l);
+			randomCell.x = l;
+			randomCell.y = h;
 			break;
 		}
 		
 	}
+}
+
+function showOneCell(h, l){
+	var view = document.querySelector("#view");
+	var con = document.createElement("div");
+	con.setAttribute("class", "cell con");
+	con.setAttribute("id", "con-"+h+"-"+l);
+	con.style.top = cellSpace*(h+1)+cellWidth*(h+0.5)+"px";
+	con.style.left = cellSpace*(l+1)+cellWidth*(l+0.5)+"px";
+	con.style.width = 0+"px";
+	con.style.height = 0+"px";
+	con.style.lineHeight = cellWidth+"px";
+	con.style.backgroundColor = numberBgColor(board[h][l].value);
+	if(board[h][l].value>100 && board[h][l].value<1000){
+		con.style.fontSize = cellWidth>100?"60px":"40px";
+	}else if(board[h][l].value>1000){
+		con.style.fontSize = cellWidth>100?"40px":"20px";
+	}
+	con.textContent = board[h][l].value;
+	view.appendChild(con);
+	setTimeout(function(){
+		con.style.width = cellWidth+"px";
+		con.style.height = cellWidth+"px";
+		con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
+		con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
+	},50)
 }
 
 function updateBoard()
@@ -443,8 +460,21 @@ function cutZero(v){
 }
 
 function moveLeft(){
+	undoScore = score;
 	for( var i=0; i<4; i++){
+		board[i] = board[i].map(function (v) {
+			v.latX1 = -1;
+			v.lastY1 = -1;
+			v.lastValue1 = 0;
+
+			v.lastX = v.nextX;
+			v.lastY = v.nextY;
+			v.lastValue = v.value;
+			return v;
+		})
+		console.log(board[i]);
 		var temp = board[i].filter(cutZero);
+
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
 				temp[j].lastValue = temp[j].value;
@@ -452,7 +482,7 @@ function moveLeft(){
 				temp[j].nextX = j;
 
 				score+=temp[j].value;
-
+				
 				temp[j].lastValue1 = temp[j+1].value;
 				temp[j].lastX1 = temp[j+1].nextX;
 				temp[j].lastY1 = temp[j+1].nextY;
@@ -472,7 +502,18 @@ function moveLeft(){
 	slideAnimate();
 }
 function moveRight(){
+	undoScore = score;
 	for( var i=0; i<4; i++){
+		board[i] = board[i].map(function (v) {
+			v.latX1 = -1;
+			v.lastY1 = -1;
+			v.lastValue1 = 0;
+
+			v.lastX = v.nextX;
+			v.lastY = v.nextY;
+			v.lastValue = v.value;
+			return v;
+		})
 		var temp = board[i].filter(function(v){
 			return v.value>0;
 		});
@@ -489,6 +530,7 @@ function moveRight(){
 				temp[j].lastY1 = temp[j-1].nextY;
 
 				temp.splice(j-1,1);
+				j--;
 			}
 		}
 		board[i].splice(0,4);
@@ -506,6 +548,7 @@ function moveRight(){
 	slideAnimate();
 }
 function moveUp(){
+	undoScore = score;
 	var boardTemp = [];
 	for(var i=0; i<4; i++){
 		boardTemp[i] = [];
@@ -514,6 +557,16 @@ function moveUp(){
 		}
 	}
 	for( var i=0; i<4; i++){
+		boardTemp[i] = boardTemp[i].map(function (v) {
+			v.latX1 = -1;
+			v.lastY1 = -1;
+			v.lastValue1 = 0;
+
+			v.lastX = v.nextX;
+			v.lastY = v.nextY;
+			v.lastValue = v.value;
+			return v;
+		})
 		var temp = boardTemp[i].filter(function(v){
 			return v.value>0;
 		});
@@ -550,6 +603,7 @@ function moveUp(){
 	slideAnimate();
 }
 function moveDown(){
+	undoScore = score;
 	var boardTemp = [];
 	for(var i=0; i<4; i++){
 		boardTemp[i] = [];
@@ -558,6 +612,16 @@ function moveDown(){
 		}
 	}
 	for( var i=0; i<4; i++){
+		boardTemp[i] = boardTemp[i].map(function (v) {
+			v.latX1 = -1;
+			v.lastY1 = -1;
+			v.lastValue1 = 0;
+
+			v.lastX = v.nextX;
+			v.lastY = v.nextY;
+			v.lastValue = v.value;
+			return v;
+		})
 		var temp = boardTemp[i].filter(function(v){
 			return v.value>0;
 		});
@@ -574,6 +638,7 @@ function moveDown(){
 				temp[j].lastX1 = temp[j-1].nextX;
 
 				temp.splice(j-1,1);
+				j--;
 			}
 		}
 		boardTemp[i].splice(0,4);
@@ -596,15 +661,13 @@ function moveDown(){
 }
 
 function slideAnimate(){
-	console.log(arguments);
+	canUndo = true;
+	document.querySelector("#undo").setAttribute("disable", false);
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
 
 			if( board[i][j].value){
-				console.log("animate");
 				var con = document.querySelector("#con-"+board[i][j].lastY+"-"+board[i][j].lastX);
-				console.log("#con-"+board[i][j].lastY+"-"+board[i][j].lastX)
-				console.log(+board[i][j].nextY+"-"+board[i][j].nextX)
 				con.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
 				con.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
 
@@ -613,12 +676,7 @@ function slideAnimate(){
 					console.log(board[i][j].lastY1+"-"+board[i][j].lastX1);
 					con1.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
 					con1.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
-					board[i][j].lastValue1 = 0;
 				}
-				
-
-				board[i][j].lastX = board[i][j].nextX;
-				board[i][j].lastY = board[i][j].nextY;
 			}
 		}
 	}
@@ -628,5 +686,78 @@ function slideAnimate(){
 		updateScore();
 		isGameOver();
 	}, 200);
+}
+function undo(){
+	if( !canUndo){
+		return;
+	}
+	canUndo = false;
+	document.querySelector("#undo").setAttribute("disable", true);
+	board[randomCell.y][randomCell.x].value = 0;
+	board[randomCell.y][randomCell.x].lastX = board[randomCell.y][randomCell.x].nextX = -1;
+	board[randomCell.y][randomCell.x].lastY = board[randomCell.y][randomCell.x].nextY = -1;
+	var view = document.querySelector("#view"),
+		cons = document.createDocumentFragment();
+
+	view.removeChild(document.querySelector("#con-"+randomCell.y+"-"+randomCell.x));
+	for (var i = 0; i < 4; i++) {
+		for (var j = 0; j < 4; j++) {
+			if( board[i][j].value){
+				console.log(board[i][j].value);
+				board[i][j].nextX = board[i][j].lastX;
+				board[i][j].nextY = board[i][j].lastY;
+				board[i][j].value = board[i][j].lastValue;
+				board[i][j].lastX = -1;
+				board[i][j].lastY = -1;
+				board[i][j].lastValue = 0;
+				var con = document.querySelector("#con-"+i+"-"+j);
+				console.log(con);
+				console.log(board[i][j].value);
+				con.textContent = board[i][j].value;
+				con.style.backgroundColor = numberBgColor(board[i][j].value);
+				con.setAttribute("id", "con-"+board[i][j].nextY+"-"+board[i][j].nextX);
+
+				if(board[i][j].lastValue1) {
+					var con1 = document.createElement("div");
+					con1.setAttribute("class", "cell con");
+					con1.setAttribute("id", "con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
+					con1.style.top = (cellWidth+cellSpace)*i+cellSpace+"px";
+					con1.style.left = (cellSpace+cellWidth)*j+cellSpace+"px";
+					con1.style.backgroundColor = numberBgColor(board[i][j].lastValue1);
+					con1.textContent = board[i][j].lastValue1;
+					cons.appendChild(con1);
+				}
+			}
+		}
+	}
+	view.appendChild(cons);
+	score = undoScore;
+	setTimeout(function(){
+		for(var i=0; i<4; i++){
+			for(var j=0; j<4; j++){
+				if( document.querySelector("#con-"+i+"-"+j)){
+					document.querySelector("#con-"+i+"-"+j).style.top=(cellSpace+cellWidth)*i+cellSpace+"px";
+					document.querySelector("#con-"+i+"-"+j).style.left=(cellSpace+cellWidth)*j+cellSpace+"px";
+
+					board[i][j].value = Number(document.querySelector("#con-"+i+"-"+j).textContent);
+					board[i][j].lastX = board[i][j].nextX = j;
+					board[i][j].lastY = board[i][j].nextY = i;
+					board[i][j].lastX1 = -1;
+					board[i][j].lastY1 = -1;
+					board[i][j].lastValue = 0;
+				}else{
+					board[i][j].value = 0;
+					board[i][j].nextX = -1;
+					board[i][j].nextY = -1;
+				}
+			}
+		}
+		updateScore();
+	}, 200);
+	
+}
+
+function setLocalBoard(){
+	
 }
 
