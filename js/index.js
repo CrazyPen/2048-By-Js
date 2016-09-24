@@ -27,6 +27,7 @@ for(var i=0;i<4;i++)
 setCss();
 	
 newGame();
+getBest();
 
 document.addEventListener("keydown",function(event){
 	if(event.which==37)
@@ -191,7 +192,14 @@ function setCss()
 	
 	view.appendChild(cells);
 }
-
+function getBest(){
+	if(typeof(Storage) !== "undefined"){
+		if(!localStorage.best){
+			localStorage.best = 0;
+		}
+		document.querySelector("#maxScore").textContent = localStorage.best;
+	}
+}
 function updateScore()
 {
 	document.querySelector("#myScore").textContent = score;
@@ -204,6 +212,7 @@ function newGame()
 {
 	score=0;
 	updateScore();
+	getBest();
 	clearBoard();
 
 	randomNumber();
@@ -414,7 +423,13 @@ function isGameOver()
 	if(canMoveUp() || canMoveDown() || canMoveRight() || canMoveLeft()){
 		return false;
 	}else{
-		setTimeout(function(){alert("Game Over!");},300);
+		setTimeout(function(){
+			document.querySelector("#over").style.display = "block";
+			document.querySelector("#finalScore").textContent = score;
+			if( score>localStorage.best ){
+				localStorage.best = score;
+			}
+		},300);
 	}
 }
 function cutZero(v){

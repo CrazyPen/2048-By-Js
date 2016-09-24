@@ -71,6 +71,46 @@ p#info {
 
 	background-color: #bbada0;
 }
+#over {
+	position: absolute;
+	top: 130px;
+	left: 10px;
+	width: 520px;
+	height: 520px;
+	display: none;
+
+	background-color: rgba(139, 115, 85, 0.9);
+}
+#over p {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	color: #E4DAC3;
+	font-size: 60px;
+
+}
+#over p:first-child{
+	top: 80px;
+}
+#over #scoreTitle {
+	top: 150px;
+	font-size: 40px;
+}
+#over p#finalScore{
+	top: 200px;
+	font-size: 80px;
+}
+#over #finalScore{
+
+}
+#over #start {
+	top: 300px;
+	left: 50%;
+	margin-left: -150px;
+	width: 300px;
+	height: 60px;
+	font-size: 40px;
+}
 .cell {
 	position: absolute;
 
