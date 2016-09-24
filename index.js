@@ -1,15 +1,18 @@
 var score=0;
-var canAdd=new Array();
 var cellWidth = 110,
 	cellSpace = 16;
 function cellData(){
-	this.lastX = 0;
-	this.nextX = 0;
-	this.lastY = 0;
-	this.nextY = 0;
+	this.lastY = -1;
+	this.lastX = -1;
+	this.lastValue = 0;
+	this.lastX1= -1;
+	this.lastY1= -1;
+	this.lastValue =0;
+	this.nextY = -1;
+	this.nextX = -1;
+	
 	this.value = 0;
 } 
-
 var board=[];
 for(var i=0;i<4;i++)
 {
@@ -32,10 +35,6 @@ document.addEventListener("keydown",function(event){
 		if(canMoveLeft())
 		{
 			moveLeft();
-			randomNumber();
-			updateBoard();
-			updateScore();
-			isGameOver();
 		}
 	}
 	if(event.which==38)
@@ -44,10 +43,6 @@ document.addEventListener("keydown",function(event){
 		if(canMoveUp())
 		{
 			moveUp();
-			randomNumber();
-			updateBoard();
-			updateScore();
-			isGameOver();
 		}
 	}
 	if(event.which==39)
@@ -56,10 +51,6 @@ document.addEventListener("keydown",function(event){
 		if(canMoveRight())
 		{
 			moveRight();
-			randomNumber();
-			updateBoard();
-			updateScore();
-			isGameOver();
 		}
 	}
 	if(event.which==40)
@@ -68,10 +59,6 @@ document.addEventListener("keydown",function(event){
 		if(canMoveDown())
 		{
 			moveDown();
-			randomNumber();
-			updateBoard();
-			updateScore();
-			isGameOver();
 		}
 		
 	}
@@ -105,18 +92,10 @@ if(Math.abs(dX)<50 && Math.abs(dY)<50){
 			if(dX>0 && canMoveRight())
 			{
 				moveRight();
-				randomNumber();
-				updateBoard();
-				updateScore();
-				isGameOver();
 				isTouchDown=0;
 			}else if(dX<0 && canMoveLeft())
 			{
 				moveLeft();
-				randomNumber();
-				updateBoard();
-				updateScore();
-				isGameOver();
 				isTouchDown=0;
 			}
 		}else if(Math.abs(dX) <= Math.abs(dY))
@@ -124,19 +103,11 @@ if(Math.abs(dX)<50 && Math.abs(dY)<50){
 			if(canMoveDown() && dY>0)
 			{
 				moveDown();
-				randomNumber();
-				updateBoard();
-				updateScore();
-				isGameOver();
 				isTouchDown=0;
 			}																
 			else if(canMoveUp() && dY<0)
 			{
 				moveUp();
-				randomNumber();
-				updateBoard();
-				updateScore();
-				isGameOver();
 				isTouchDown=0;
 			}
 		}}
@@ -257,13 +228,12 @@ function clearBoard()
 			board[i][j]=new cellData();
 		}
 	}
-	console.log(board);
 	updateBoard();
 }
 
 function randomNumber()
 {
-	
+	var view = document.querySelector("#view");
 	while(true)
 	{
 		var h=Math.floor(Math.random()*4);
@@ -274,8 +244,26 @@ function randomNumber()
 			board[h][l].value=(Math.random()>0.5?2:4);
 			board[h][l].lastX = board[h][l].nextX = l;
 			board[h][l].lastY = board[h][l].nextY = h;
+
+			var con = document.createElement("div");
+			con.setAttribute("class", "cell con");
+			con.setAttribute("id", "con-"+h+"-"+l);
+			con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
+			con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
+			con.style.width = cellWidth+"px";
+			con.style.height = cellWidth+"px";
+			con.style.lineHeight = cellWidth+"px";
+			con.style.backgroundColor = numberBgColor(board[h][l].value);
+			if(board[h][l].value>100 && board[h][l].value<1000){
+				con.style.fontSize = cellWidth>100?"60px":"40px";
+			}else if(board[h][l].value>1000){
+				con.style.fontSize = cellWidth>100?"40px":"20px";
+			}
+			con.textContent = board[h][l].value;
+			view.appendChild(con);
 			break;
 		}
+		
 	}
 }
 
@@ -299,6 +287,7 @@ function updateBoard()
 		{
 			if(board[i][j].value)
 			{
+				console.log(i+","+j);
 				var con = document.createElement("div");
 				con.setAttribute("class", "cell con");
 				con.setAttribute("id", "con-"+i+"-"+j);
@@ -308,24 +297,27 @@ function updateBoard()
 				con.style.height = cellWidth+"px";
 				con.style.lineHeight = cellWidth+"px";
 				con.style.backgroundColor = numberBgColor(board[i][j].value);
+				if(board[i][j].value>100 && board[i][j].value<1000){
+					con.style.fontSize = cellWidth>100?"60px":"40px";
+				}else if(board[i][j].value>1000){
+					con.style.fontSize = cellWidth>100?"40px":"20px";
+				}
 				con.textContent = board[i][j].value;
 				cons.appendChild(con);
-			}else{
-				var cell = document.querySelector("#con-"+i+"-"+j);				
 			}
 		}
 	}
-	console.log("update success");
 	view.appendChild(cons);
+
 }
 
 function numberBgColor(num)
 {
 	switch (num)
 	{
-		case 2:return "#D3D3D3" ;break;
-		case 4:return "#F5DEB3" ;break;
-		case 8:return "#F4A460" ;break;
+		case 2:return "#DEDCDC" ;break;
+		case 4:return "#E4E0B4" ;break;
+		case 8:return "#f2b179" ;break;
 		case 16:return "#FFA500" ;break;
 		case 32:return "#FF8C00" ;break;
 		case 64:return "#FF6347" ;break;
@@ -342,7 +334,6 @@ function numberBgColor(num)
 
 function canMoveLeft()
 {
-	console.log("canMoveLeft");
 	for(var i=0;i<4;i++)
 	{
 		for(var j=1;j<4;j++)
@@ -363,7 +354,6 @@ function canMoveLeft()
 
 function canMoveUp()
 {
-	console.log("canMoveUp");
 	for(var j=0;j<4;j++)
 	{
 		for(var i=1;i<4;i++)
@@ -422,63 +412,79 @@ function canMoveRight()
 function isGameOver()
 {
 	if(canMoveUp() || canMoveDown() || canMoveRight() || canMoveLeft()){
-		return;
+		return false;
 	}else{
 		setTimeout(function(){alert("Game Over!");},300);
 	}
 }
+function cutZero(v){
+	return v.value>0;
+}
 
 function moveLeft(){
 	for( var i=0; i<4; i++){
-		var temp = board[i].filter(function(v){
-			return v.value>0;
-		});
+		var temp = board[i].filter(cutZero);
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
+				temp[j].lastValue = temp[j].value;
 				temp[j].value*=2;
+				temp[j].nextX = j;
+
+				score+=temp[j].value;
+
+				temp[j].lastValue1 = temp[j+1].value;
+				temp[j].lastX1 = temp[j+1].nextX;
+				temp[j].lastY1 = temp[j+1].nextY;
 				temp.splice(j+1,1);
 			}
 		}
 		for(var j=0; j<4; j++){
 			if( j<temp.length){
 				board[i][j] = temp[j];
-				board[i][j].nextX=j;
+				temp[j].nextX = j;
 			}else{
 				board[i][j] = new cellData();
 			}
 		}
-		updateBoard();
+		
 	}
+	slideAnimate();
 }
 function moveRight(){
 	for( var i=0; i<4; i++){
 		var temp = board[i].filter(function(v){
 			return v.value>0;
 		});
-		for (var j = temp.length-1; j > 0; j--) {
+		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
+				temp[j].lastValue = temp[j].value;
 				temp[j].value*=2;
+				temp[j].nextX = 4+j-len;
+
+				score+=temp[j].value;
+
+				temp[j].lastValue1 = temp[j-1].value;
+				temp[j].lastX1 = temp[j-1].nextX;
+				temp[j].lastY1 = temp[j-1].nextY;
+
 				temp.splice(j-1,1);
 			}
 		}
 		board[i].splice(0,4);
-		console.log(board[i].length);
 		board[i] = board[i].concat(temp);
-		console.log(temp.length);
-		console.log(board[i].length);
 		var k=0;
 		while(board[i].length<4){
 			board[i].unshift(new cellData());
 			k++;
 		}
-		for(;k<4;k++){
-			board[i].nextX = k;
+		for(; k<4; k++){
+			board[i][k].nextX = k;
 		}
-		updateBoard();
+		
 	}
+	slideAnimate();
 }
 function moveUp(){
-	console.log("moveUp");
 	var boardTemp = [];
 	for(var i=0; i<4; i++){
 		boardTemp[i] = [];
@@ -486,14 +492,22 @@ function moveUp(){
 			boardTemp[i][j] = board[j][i];
 		}
 	}
-	console.log(boardTemp[0]);
 	for( var i=0; i<4; i++){
 		var temp = boardTemp[i].filter(function(v){
 			return v.value>0;
 		});
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
+				temp[j].lastValue = temp[j].value;
 				temp[j].value*=2;
+				temp[j].nextY = j;
+
+				score+=temp[j].value;
+
+				temp[j].lastValue1 = temp[j+1].value;
+				temp[j].lastY1 = temp[j+1].nextY;
+				temp[j].lastX1 = temp[j+1].nextX;
+
 				temp.splice(j+1,1);
 			}
 		}
@@ -512,8 +526,7 @@ function moveUp(){
 			board[i][j] = boardTemp[j][i];
 		}
 	}
-	updateBoard();
-	console.log("move up");
+	slideAnimate();
 }
 function moveDown(){
 	var boardTemp = [];
@@ -527,9 +540,18 @@ function moveDown(){
 		var temp = boardTemp[i].filter(function(v){
 			return v.value>0;
 		});
-		for (var j = temp.length-1; j > 0; j--) {
+		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
+				temp[j].lastValue = temp[j].value;
 				temp[j].value*=2;
+				temp[j].nextY = 4+j-len;
+
+				score+=temp[j].value;
+
+				temp[j].lastValue1 = temp[j-1].value;
+				temp[j].lastY1 = temp[j-1].nextY;
+				temp[j].lastX1 = temp[j-1].nextX;
+
 				temp.splice(j-1,1);
 			}
 		}
@@ -541,7 +563,7 @@ function moveDown(){
 			k++;
 		}
 		for(;k<4;k++){
-			boardTemp[i].nextY = k;
+			boardTemp[i][k].nextY = k;
 		}
 	}
 	for(var i=0; i<4; i++){
@@ -549,6 +571,41 @@ function moveDown(){
 			board[i][j] = boardTemp[j][i];
 		}
 	}
-	updateBoard();
+	slideAnimate();
+}
+
+function slideAnimate(){
+	console.log(arguments);
+	for(var i=0; i<4; i++){
+		for(var j=0; j<4; j++){
+
+			if( board[i][j].value){
+				console.log("animate");
+				var con = document.querySelector("#con-"+board[i][j].lastY+"-"+board[i][j].lastX);
+				console.log("#con-"+board[i][j].lastY+"-"+board[i][j].lastX)
+				console.log(+board[i][j].nextY+"-"+board[i][j].nextX)
+				con.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
+				con.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
+
+				if( board[i][j].lastValue1){
+					var con1 = document.querySelector("#con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
+					console.log(board[i][j].lastY1+"-"+board[i][j].lastX1);
+					con1.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
+					con1.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
+					board[i][j].lastValue1 = 0;
+				}
+				
+
+				board[i][j].lastX = board[i][j].nextX;
+				board[i][j].lastY = board[i][j].nextY;
+			}
+		}
+	}
+	setTimeout(function(){
+		updateBoard();
+		randomNumber();
+		updateScore();
+		isGameOver();
+	}, 200);
 }
 
