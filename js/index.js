@@ -10,7 +10,7 @@ function cellData(){
 	this.lastValue = 0;
 	this.lastX1= -1;
 	this.lastY1= -1;
-	this.lastValue =0;
+	this.lastValue1 =0;
 	this.nextY = -1;
 	this.nextX = -1;
 	
@@ -71,7 +71,7 @@ document.addEventListener("keydown",function(event){
 });
 
 var isTouchDown=0;
-document.addEventListener("touchstart",function(e){
+document.querySelector("#view").addEventListener("touchstart",function(e){
 	e.preventDefault();
 	
 	startX=e.changedTouches[0].pageX;
@@ -79,7 +79,7 @@ document.addEventListener("touchstart",function(e){
 	isTouchDown=1;
 });
 
-document.addEventListener("touchend",function(e){
+document.querySelector("#view").addEventListener("touchend",function(e){
 	e.preventDefault();
 
 if(isTouchDown != 1)
@@ -90,7 +90,7 @@ var endY = e.changedTouches[0].pageY;
 
 var dX= endX - startX;
 var dY= endY - startY;
-
+console.log(dX+","+dY);
 if(Math.abs(dX)<50 && Math.abs(dY)<50){
 	return;
 }else{ if(Math.abs(dX) > Math.abs(dY))
@@ -118,50 +118,6 @@ if(Math.abs(dX)<50 && Math.abs(dY)<50){
 			}
 		}}
 });
-
-document.addEventListener("mousedown",function(event) {
-	event.preventDefault();
-	var startMouseX=event.clientX;
-	var startMouseY=event.clientY;
-
-
-	document.onmouseup=function(event) {
-		event.preventDefault();
-		var endMouseX=event.clientX;
-		var endMouseY=event.clientY;
-
-		var mouseX=endMouseX-startMouseX;
-		var mouseY=endMouseY-startMouseY;
-
-		if(Math.abs(mouseX)<50 && Math.abs(mouseY)<50){
-			return;
-		}else { if(Math.abs(mouseX) > Math.abs(mouseY))
-				{
-					if(mouseX>0 && canMoveRight())
-					{
-						moveRight();
-
-					}else if(mouseX<0 && canMoveLeft())
-					{
-						moveLeft();
-
-					}
-				}else if(Math.abs(mouseX) <= Math.abs(mouseY))
-				{
-					if(canMoveDown() && mouseY>0)
-					{
-						moveDown();
-
-					}															
-					else if(canMoveUp() && mouseY<0)
-					{
-						moveUp();
-					}
-				}}
-
-	};
-});
-
 
 function setCss()
 {
@@ -314,7 +270,7 @@ function updateBoard()
 		{
 			if(board[i][j].value)
 			{
-				console.log(i+","+j);
+				// console.log(i+","+j);
 				var con = document.createElement("div");
 				con.setAttribute("class", "cell con");
 				con.setAttribute("id", "con-"+i+"-"+j);
@@ -327,7 +283,7 @@ function updateBoard()
 				if(board[i][j].value>100 && board[i][j].value<1000){
 					con.style.fontSize = cellWidth>100?"60px":"40px";
 				}else if(board[i][j].value>1000){
-					con.style.fontSize = cellWidth>100?"40px":"20px";
+					con.style.fontSize = cellWidth>100?"40px":"30px";
 				}
 				con.textContent = board[i][j].value;
 				cons.appendChild(con);
@@ -467,7 +423,7 @@ function moveLeft(){
 			v.lastValue = v.value;
 			return v;
 		})
-		console.log(board[i]);
+		// console.log(board[i]);
 		var temp = board[i].filter(cutZero);
 
 		for (var j = 0; j < temp.length-1; j++) {
@@ -657,7 +613,8 @@ function moveDown(){
 
 function slideAnimate(){
 	canUndo = true;
-	document.querySelector("#undo").setAttribute("disable", false);
+	document.querySelector("#undo").removeAttribute("disabled");
+	document.querySelector("#undo").style.backgroundColor = "#8f7a66";
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
 
@@ -668,7 +625,7 @@ function slideAnimate(){
 
 				if( board[i][j].lastValue1){
 					var con1 = document.querySelector("#con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
-					console.log(board[i][j].lastY1+"-"+board[i][j].lastX1);
+					// console.log(board[i][j].lastY1+"-"+board[i][j].lastX1);
 					con1.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
 					con1.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
 				}
@@ -686,8 +643,10 @@ function undo(){
 	if( !canUndo){
 		return;
 	}
+	console.log("undo");
 	canUndo = false;
-	document.querySelector("#undo").setAttribute("disable", true);
+	document.querySelector("#undo").setAttribute("disabled", "true");
+	document.querySelector("#undo").style.backgroundColor = "#CECECE";
 	board[randomCell.y][randomCell.x].value = 0;
 	board[randomCell.y][randomCell.x].lastX = board[randomCell.y][randomCell.x].nextX = -1;
 	board[randomCell.y][randomCell.x].lastY = board[randomCell.y][randomCell.x].nextY = -1;
@@ -698,7 +657,7 @@ function undo(){
 	for (var i = 0; i < 4; i++) {
 		for (var j = 0; j < 4; j++) {
 			if( board[i][j].value){
-				console.log(board[i][j].value);
+				// console.log(board[i][j].value);
 				board[i][j].nextX = board[i][j].lastX;
 				board[i][j].nextY = board[i][j].lastY;
 				board[i][j].value = board[i][j].lastValue;
@@ -706,8 +665,8 @@ function undo(){
 				board[i][j].lastY = -1;
 				board[i][j].lastValue = 0;
 				var con = document.querySelector("#con-"+i+"-"+j);
-				console.log(con);
-				console.log(board[i][j].value);
+				// console.log(con);
+				// console.log(board[i][j].value);
 				con.textContent = board[i][j].value;
 				con.style.backgroundColor = numberBgColor(board[i][j].value);
 				con.setAttribute("id", "con-"+board[i][j].nextY+"-"+board[i][j].nextX);

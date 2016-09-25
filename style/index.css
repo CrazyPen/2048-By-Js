@@ -138,6 +138,9 @@ button{
 	background-repeat: no-repeat;
 	color: white;
 }
+button:active{
+	background-color: #C0BEBE;
+}
 button#restart{
 	right:20px;
 }
