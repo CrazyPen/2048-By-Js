@@ -29,8 +29,7 @@ var view = document.querySelector("#view");
 
 //绘制方格
 setCss();
-newGame();
-getBest();
+getLocalBoard();
 document.querySelector("#restart").addEventListener("click",newGame);
 document.querySelector("#start").addEventListener("click", newGame);
 document.querySelector("#undo").addEventListener("click", undo);
@@ -578,9 +577,11 @@ function slideAnimate(){
 			}
 		}
 	}
+	
 	setTimeout(function(){
 		updateBoard();
 		randomNumber();
+		setLocalBoard();
 		updateScore();
 		isGameOver();
 	}, 200);
@@ -654,6 +655,29 @@ function undo(){
 }
 
 function setLocalBoard(){
-	
+	if( typeof(Storage) === "undefined")
+		return ;
+
+	var localBoard = JSON.stringify(board);
+	localStorage.board = localBoard;
+	localStorage.score = score;
 }
 
+function getLocalBoard(){
+	if(localStorage.board){
+		board = JSON.parse(localStorage.board);
+		updateBoard();
+		if(!localStorage.best){
+			localStorage.best = 0;
+		}
+		document.querySelector("#maxScore").textContent = localStorage.best;
+		if( !localStorage.score){
+			localStorage.score = 0;
+		}
+		score = Number(localStorage.score);
+		updateScore();
+		
+	}else{
+		newGame();
+	}
+}
