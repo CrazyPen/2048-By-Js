@@ -140,27 +140,22 @@ document.addEventListener("mousedown",function(event) {
 					if(mouseX>0 && canMoveRight())
 					{
 						moveRight();
-						updateScore();
-						isGameOver();
+
 					}else if(mouseX<0 && canMoveLeft())
 					{
 						moveLeft();
-						updateScore();
-						isGameOver();
+
 					}
 				}else if(Math.abs(mouseX) <= Math.abs(mouseY))
 				{
-					if(canMoveBottom() && mouseY>0)
+					if(canMoveDown() && mouseY>0)
 					{
-						moveBottom();
-						updateScore();
-						isGameOver();
-					}																
-					else if(canMoveTop() && mouseY<0)
+						moveDown();
+
+					}															
+					else if(canMoveUp() && mouseY<0)
 					{
-						moveTop();
-						updateScore();
-						isGameOver();
+						moveUp();
 					}
 				}}
 
