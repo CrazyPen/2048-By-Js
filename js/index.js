@@ -25,6 +25,7 @@ for(var i=0;i<4;i++)
 		board[i][j]=new cellData();
 	}
 }
+var view = document.querySelector("#view");
 
 //绘制方格
 setCss();
@@ -71,7 +72,7 @@ document.addEventListener("keydown",function(event){
 });
 
 var isTouchDown=0;
-document.querySelector("#view").addEventListener("touchstart",function(e){
+view.addEventListener("touchstart",function(e){
 	e.preventDefault();
 	
 	startX=e.changedTouches[0].pageX;
@@ -79,7 +80,7 @@ document.querySelector("#view").addEventListener("touchstart",function(e){
 	isTouchDown=1;
 });
 
-document.querySelector("#view").addEventListener("touchend",function(e){
+view.addEventListener("touchend",function(e){
 	e.preventDefault();
 
 if(isTouchDown != 1)
@@ -121,7 +122,6 @@ if(Math.abs(dX)<50 && Math.abs(dY)<50){
 
 function setCss()
 {
-	var view = document.querySelector("#view");
 	var cells = document.createDocumentFragment();
 	clientWidth = document.body.clientWidth;
 	if(clientWidth<500)
@@ -185,12 +185,7 @@ function newGame()
 
 function clearBoard()
 {
-	var cons = document.querySelectorAll(".con");
-	if(cons.length>0){
-		for( var i=0,len=cons.length; i<len; i++){
-			cons[i].parentNode.removeChild(cons[i]);
-		}
-	}
+	removeCons();
 	
 	for(var i=0;i<4;i++)
 	{
@@ -225,7 +220,6 @@ function randomNumber()
 }
 
 function showOneCell(h, l){
-	var view = document.querySelector("#view");
 	var con = document.createElement("div");
 	con.setAttribute("class", "cell con");
 	con.setAttribute("id", "con-"+h+"-"+l);
@@ -238,7 +232,7 @@ function showOneCell(h, l){
 	if(board[h][l].value>100 && board[h][l].value<1000){
 		con.style.fontSize = cellWidth>100?"60px":"40px";
 	}else if(board[h][l].value>1000){
-		con.style.fontSize = cellWidth>100?"40px":"20px";
+		con.style.fontSize = cellWidth>100?"40px":"30px";
 	}
 	con.textContent = board[h][l].value;
 	view.appendChild(con);
@@ -247,22 +241,21 @@ function showOneCell(h, l){
 		con.style.height = cellWidth+"px";
 		con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
 		con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
-	},50)
+	},10)
 }
-
-function updateBoard()
-{
-
+function removeCons(){
 	var cons = document.querySelectorAll(".con");
-		view = document.getElementById("view");
 	if(cons.length>0){
 		for( var i=0,len=cons.length; i<len; i++){
 			view.removeChild(cons[i]);
 		}
 	}
-	
+}
 
-	
+function updateBoard()
+{
+	removeCons();
+		
 	var cons = document.createDocumentFragment();
 	for(var i=0;i<4;i++)
 	{
@@ -270,7 +263,6 @@ function updateBoard()
 		{
 			if(board[i][j].value)
 			{
-				// console.log(i+","+j);
 				var con = document.createElement("div");
 				con.setAttribute("class", "cell con");
 				con.setAttribute("id", "con-"+i+"-"+j);
@@ -321,11 +313,7 @@ function canMoveLeft()
 	{
 		for(var j=1;j<4;j++)
 		{
-			if(board[i][j].value !=0 && board[i][j-1].value ==0 )
-			{
-				return true;
-			}
-			if(board[i][j].value !=0 && board[i][j].value == board[i][j-1].value)
+			if(board[i][j].value !=0 && (board[i][j-1].value ==0 || board[i][j].value == board[i][j-1].value))
 			{
 				return true;
 			}
@@ -341,11 +329,7 @@ function canMoveUp()
 	{
 		for(var i=1;i<4;i++)
 		{
-			if(board[i][j].value !=0 && board[i-1][j].value ==0 )
-			{
-				return true;
-			}
-			if(board[i][j].value !=0 && board[i][j].value === board[i-1][j].value)
+			if(board[i][j].value !=0 && (board[i-1][j].value ==0 || board[i][j].value === board[i-1][j].value))
 			{
 				return true;
 			}
@@ -360,11 +344,7 @@ function canMoveDown()
 	{
 		for(var i=2;i>=0;i--)
 		{
-			if(board[i][j].value !=0 && board[i+1][j].value ==0 )
-			{
-				return true;
-			}
-			if(board[i][j].value !=0 && board[i][j].value == board[i+1][j].value)
+			if(board[i][j].value !=0 && (board[i+1][j].value ==0 || board[i][j].value == board[i+1][j].value))
 			{
 				return true;
 			}
@@ -379,11 +359,7 @@ function canMoveRight()
 	{
 		for(var j=2;j>=0;j--)
 		{
-			if(board[i][j].value !=0 && board[i][j+1].value ==0 )
-			{
-				return true;
-			}
-			if(board[i][j].value !=0 && board[i][j].value == board[i][j+1].value)
+			if(board[i][j].value !=0 && (board[i][j+1].value ==0 || board[i][j].value == board[i][j+1].value))
 			{
 				return true;
 			}
@@ -410,10 +386,9 @@ function cutZero(v){
 	return v.value>0;
 }
 
-function moveLeft(){
-	undoScore = score;
-	for( var i=0; i<4; i++){
-		board[i] = board[i].map(function (v) {
+//移动前的准备
+function readyMove(boardData){
+	boardData = boardData.map(function (v) {
 			v.latX1 = -1;
 			v.lastY1 = -1;
 			v.lastValue1 = 0;
@@ -423,9 +398,12 @@ function moveLeft(){
 			v.lastValue = v.value;
 			return v;
 		})
-		// console.log(board[i]);
+}
+function moveLeft(){
+	undoScore = score;
+	for( var i=0; i<4; i++){
+		readyMove(board[i]);
 		var temp = board[i].filter(cutZero);
-
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
 				temp[j].lastValue = temp[j].value;
@@ -455,19 +433,8 @@ function moveLeft(){
 function moveRight(){
 	undoScore = score;
 	for( var i=0; i<4; i++){
-		board[i] = board[i].map(function (v) {
-			v.latX1 = -1;
-			v.lastY1 = -1;
-			v.lastValue1 = 0;
-
-			v.lastX = v.nextX;
-			v.lastY = v.nextY;
-			v.lastValue = v.value;
-			return v;
-		})
-		var temp = board[i].filter(function(v){
-			return v.value>0;
-		});
+		readyMove(board[i])
+		var temp = board[i].filter(cutZero);
 		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
 				temp[j].lastValue = temp[j].value;
@@ -508,19 +475,8 @@ function moveUp(){
 		}
 	}
 	for( var i=0; i<4; i++){
-		boardTemp[i] = boardTemp[i].map(function (v) {
-			v.latX1 = -1;
-			v.lastY1 = -1;
-			v.lastValue1 = 0;
-
-			v.lastX = v.nextX;
-			v.lastY = v.nextY;
-			v.lastValue = v.value;
-			return v;
-		})
-		var temp = boardTemp[i].filter(function(v){
-			return v.value>0;
-		});
+		readyMove(boardTemp[i]);
+		var temp = boardTemp[i].filter(cutZero);
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
 				temp[j].lastValue = temp[j].value;
@@ -563,19 +519,8 @@ function moveDown(){
 		}
 	}
 	for( var i=0; i<4; i++){
-		boardTemp[i] = boardTemp[i].map(function (v) {
-			v.latX1 = -1;
-			v.lastY1 = -1;
-			v.lastValue1 = 0;
-
-			v.lastX = v.nextX;
-			v.lastY = v.nextY;
-			v.lastValue = v.value;
-			return v;
-		})
-		var temp = boardTemp[i].filter(function(v){
-			return v.value>0;
-		});
+		readyMove(boardTemp[i]);
+		var temp = boardTemp[i].filter(cutZero);
 		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
 				temp[j].lastValue = temp[j].value;
@@ -612,9 +557,11 @@ function moveDown(){
 }
 
 function slideAnimate(){
+	//上一步可用
 	canUndo = true;
 	document.querySelector("#undo").removeAttribute("disabled");
 	document.querySelector("#undo").style.backgroundColor = "#8f7a66";
+
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
 
@@ -625,7 +572,6 @@ function slideAnimate(){
 
 				if( board[i][j].lastValue1){
 					var con1 = document.querySelector("#con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
-					// console.log(board[i][j].lastY1+"-"+board[i][j].lastX1);
 					con1.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
 					con1.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
 				}
@@ -643,21 +589,19 @@ function undo(){
 	if( !canUndo){
 		return;
 	}
-	console.log("undo");
+	//上一步不可用
 	canUndo = false;
 	document.querySelector("#undo").setAttribute("disabled", "true");
 	document.querySelector("#undo").style.backgroundColor = "#CECECE";
 	board[randomCell.y][randomCell.x].value = 0;
 	board[randomCell.y][randomCell.x].lastX = board[randomCell.y][randomCell.x].nextX = -1;
 	board[randomCell.y][randomCell.x].lastY = board[randomCell.y][randomCell.x].nextY = -1;
-	var view = document.querySelector("#view"),
-		cons = document.createDocumentFragment();
+	var	cons = document.createDocumentFragment();
 
 	view.removeChild(document.querySelector("#con-"+randomCell.y+"-"+randomCell.x));
 	for (var i = 0; i < 4; i++) {
 		for (var j = 0; j < 4; j++) {
 			if( board[i][j].value){
-				// console.log(board[i][j].value);
 				board[i][j].nextX = board[i][j].lastX;
 				board[i][j].nextY = board[i][j].lastY;
 				board[i][j].value = board[i][j].lastValue;
@@ -665,8 +609,6 @@ function undo(){
 				board[i][j].lastY = -1;
 				board[i][j].lastValue = 0;
 				var con = document.querySelector("#con-"+i+"-"+j);
-				// console.log(con);
-				// console.log(board[i][j].value);
 				con.textContent = board[i][j].value;
 				con.style.backgroundColor = numberBgColor(board[i][j].value);
 				con.setAttribute("id", "con-"+board[i][j].nextY+"-"+board[i][j].nextX);
