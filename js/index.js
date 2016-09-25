@@ -620,6 +620,9 @@ function undo(){
 					con1.setAttribute("id", "con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
 					con1.style.top = (cellWidth+cellSpace)*i+cellSpace+"px";
 					con1.style.left = (cellSpace+cellWidth)*j+cellSpace+"px";
+					con1.style.width = cellWidth+"px";
+					con1.style.height = cellWidth+"px";
+					con1.style.lineHeight = cellWidth+"px";
 					con1.style.backgroundColor = numberBgColor(board[i][j].lastValue1);
 					con1.textContent = board[i][j].lastValue1;
 					cons.appendChild(con1);
