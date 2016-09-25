@@ -346,15 +346,15 @@ function numberBgColor(num)
 		case 4:return "#E4E0B4" ;break;
 		case 8:return "#f2b179" ;break;
 		case 16:return "#FFA500" ;break;
-		case 32:return "#FF8C00" ;break;
-		case 64:return "#FF6347" ;break;
-		case 128:return "#FF4500" ;break;
-		case 256:return "#C71585" ;break;
-		case 512:return "#B22222" ;break;
-		case 1024:return "#7B68EE" ;break;
-		case 2048:return "#7B68EE" ;break;
-		case 4096:return "#483D8B" ;break;
-		case 8192:return "#800080" ;break;
+		case 32:return "#F75F08" ;break;
+		case 64:return "#F82008" ;break;
+		case 128:return "#9DF30C" ;break;
+		case 256:return "#09FA26" ;break;
+		case 512:return "#0DFBA7" ;break;
+		case 1024:return "#0FE0FA" ;break;
+		case 2048:return "#0B84F2" ;break;
+		case 4096:return "#0C4BFA" ;break;
+		case 8192:return "#BD10F8" ;break;
 		default:return "#191970";
 	}
 }
