@@ -31,7 +31,10 @@ var view = document.querySelector("#view");
 setCss();
 getLocalBoard();
 document.querySelector("#restart").addEventListener("click",newGame);
-document.querySelector("#start").addEventListener("click", newGame);
+document.querySelector("#start").addEventListener("click", function(){
+	newGame();
+	document.querySelector("#over").display = none;
+});
 document.querySelector("#undo").addEventListener("click", undo);
 
 document.addEventListener("keydown",function(event){
