@@ -34,7 +34,7 @@ getLocalBoard();
 document.querySelector("#restart").addEventListener("click",newGame);
 document.querySelector("#start").addEventListener("click", function(){
 	newGame();
-	document.querySelector("#over").display = "none";
+	document.querySelector("#over").style.display = "none";
 });
 document.querySelector("#undo").addEventListener("click", undo);
 
@@ -680,7 +680,6 @@ function setLocalBoard(){
 
 function getLocalBoard(){
 	if(localStorage.board !== undefined){
-		console.log("board")
 		board = JSON.parse(localStorage.board);
 		updateBoard();
 	}else{
