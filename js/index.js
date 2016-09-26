@@ -30,6 +30,7 @@ var view = document.querySelector("#view");
 //绘制方格
 setCss();
 getLocalBoard();
+
 document.querySelector("#restart").addEventListener("click",newGame);
 document.querySelector("#start").addEventListener("click", function(){
 	newGame();
@@ -165,8 +166,8 @@ function getBest(){
 }
 function updateScore()
 {
-
 	document.querySelector("#myScore").textContent = score;
+	localStorage.score = score;
 }
 
 
@@ -378,6 +379,8 @@ function isGameOver()
 		setTimeout(function(){
 			document.querySelector("#over").style.display = "block";
 			document.querySelector("#finalScore").textContent = score;
+			localStorage.board = "undefined";
+			localStorage.score = 0;
 			if( score>localStorage.best ){
 				localStorage.best = score;
 			}
@@ -634,7 +637,9 @@ function undo(){
 		}
 	}
 	view.appendChild(cons);
+
 	score = undoScore;
+
 	setTimeout(function(){
 		for(var i=0; i<4; i++){
 			for(var j=0; j<4; j++){
@@ -663,27 +668,24 @@ function undo(){
 function setLocalBoard(){
 	if( typeof(Storage) === "undefined")
 		return ;
-
 	var localBoard = JSON.stringify(board);
 	localStorage.board = localBoard;
-	localStorage.score = score;
 }
 
 function getLocalBoard(){
-	if(localStorage.board){
+	if(localStorage.board !== "undefined"){
 		board = JSON.parse(localStorage.board);
 		updateBoard();
-		if(!localStorage.best){
-			localStorage.best = 0;
-		}
-		document.querySelector("#maxScore").textContent = localStorage.best;
-		if( !localStorage.score){
-			localStorage.score = 0;
-		}
-		score = Number(localStorage.score);
-		updateScore();
-		
 	}else{
 		newGame();
 	}
+	if(!localStorage.best){
+		localStorage.best = 0;
+	}
+	document.querySelector("#maxScore").textContent = localStorage.best;
+	if( !localStorage.score){
+		localStorage.score = 0;
+	}
+	score = Number(localStorage.score);
+	updateScore();
 }
