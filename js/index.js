@@ -679,7 +679,8 @@ function setLocalBoard(){
 }
 
 function getLocalBoard(){
-	if(localStorage.board !== "undefined"){
+	if(localStorage.board !== undefined){
+		console.log("board")
 		board = JSON.parse(localStorage.board);
 		updateBoard();
 	}else{
@@ -691,7 +692,7 @@ function getLocalBoard(){
 	document.querySelector("#maxScore").textContent = localStorage.best;
 	if( !localStorage.score){
 		localStorage.score = 0;
+		score = 0;
 	}
-	score = Number(localStorage.score);
 	updateScore();
 }
