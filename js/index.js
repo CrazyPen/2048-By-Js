@@ -1,10 +1,11 @@
-var score=0;
-var undoScore = 0;
+"use strict";
+var score = 0,
+	undoScore = 0;
 var canUndo = false;
 var cellWidth = 110,
 	cellSpace = 16;
 var randomCell = {x:-1, y:-1};
-function cellData(){
+function CellData(){
 	this.lastY = -1;
 	this.lastX = -1;
 	this.lastValue = 0;
@@ -13,7 +14,6 @@ function cellData(){
 	this.lastValue1 =0;
 	this.nextY = -1;
 	this.nextX = -1;
-	
 	this.value = 0;
 } 
 var board=[];
@@ -22,7 +22,7 @@ for(var i=0;i<4;i++)
 	board[i] =[];
 	for(var j=0;j<4;j++)
 	{
-		board[i][j]=new cellData();
+		board[i][j]=new CellData();
 	}
 }
 var view = document.querySelector("#view");
@@ -34,7 +34,7 @@ getLocalBoard();
 document.querySelector("#restart").addEventListener("click",newGame);
 document.querySelector("#start").addEventListener("click", function(){
 	newGame();
-	document.querySelector("#over").display = none;
+	document.querySelector("#over").display = "none";
 });
 document.querySelector("#undo").addEventListener("click", undo);
 
@@ -75,6 +75,8 @@ document.addEventListener("keydown",function(event){
 });
 
 var isTouchDown=0;
+var startX = 0,
+	startY = 0;
 view.addEventListener("touchstart",function(e){
 	e.preventDefault();
 	
@@ -94,7 +96,6 @@ var endY = e.changedTouches[0].pageY;
 
 var dX= endX - startX;
 var dY= endY - startY;
-console.log(dX+","+dY);
 if(Math.abs(dX)<50 && Math.abs(dY)<50){
 	return;
 }else{ if(Math.abs(dX) > Math.abs(dY))
@@ -126,7 +127,7 @@ if(Math.abs(dX)<50 && Math.abs(dY)<50){
 function setCss()
 {
 	var cells = document.createDocumentFragment();
-	clientWidth = document.body.clientWidth;
+	var clientWidth = document.body.clientWidth;
 	if(clientWidth<500)
 	{
 		document.querySelector("#game").style.width = clientWidth+"px";
@@ -194,7 +195,7 @@ function clearBoard()
 	{
 		for(var j=0;j<4;j++)
 		{
-			board[i][j]=new cellData();
+			board[i][j]=new CellData();
 		}
 	}
 	updateBoard();
@@ -207,7 +208,7 @@ function randomNumber()
 		var h=Math.floor(Math.random()*4);
 		var l=Math.floor(Math.random()*4);
 
-		if(board[h][l].value==0)
+		if(board[h][l].value===0)
 		{
 			board[h][l].value=(Math.random()>0.5?2:4);
 			board[h][l].lastX = board[h][l].nextX = l;
@@ -244,7 +245,7 @@ function showOneCell(h, l){
 		con.style.height = cellWidth+"px";
 		con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
 		con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
-	},10)
+	},10);
 }
 function removeCons(){
 	var cons = document.querySelectorAll(".con");
@@ -293,19 +294,19 @@ function numberBgColor(num)
 {
 	switch (num)
 	{
-		case 2:return "#DEDCDC" ;break;
-		case 4:return "#E4E0B4" ;break;
-		case 8:return "#f2b179" ;break;
-		case 16:return "#FFA500" ;break;
-		case 32:return "#F75F08" ;break;
-		case 64:return "#F82008" ;break;
-		case 128:return "#9DF30C" ;break;
-		case 256:return "#09FA26" ;break;
-		case 512:return "#0DFBA7" ;break;
-		case 1024:return "#0FE0FA" ;break;
-		case 2048:return "#0B84F2" ;break;
-		case 4096:return "#0C4BFA" ;break;
-		case 8192:return "#BD10F8" ;break;
+		case 2:return "#DEDCDC" ;
+		case 4:return "#E4E0B4" ;
+		case 8:return "#f2b179" ;
+		case 16:return "#FFA500" ;
+		case 32:return "#F75F08" ;
+		case 64:return "#F82008" ;
+		case 128:return "#9DF30C" ;
+		case 256:return "#09FA26" ;
+		case 512:return "#0DFBA7" ;
+		case 1024:return "#0FE0FA" ;
+		case 2048:return "#0B84F2" ;
+		case 4096:return "#0C4BFA" ;
+		case 8192:return "#BD10F8" ;
 		default:return "#191970";
 	}
 }
@@ -316,7 +317,7 @@ function canMoveLeft()
 	{
 		for(var j=1;j<4;j++)
 		{
-			if(board[i][j].value !=0 && (board[i][j-1].value ==0 || board[i][j].value == board[i][j-1].value))
+			if(board[i][j].value !==0 && (board[i][j-1].value ===0 || board[i][j].value === board[i][j-1].value))
 			{
 				return true;
 			}
@@ -332,7 +333,7 @@ function canMoveUp()
 	{
 		for(var i=1;i<4;i++)
 		{
-			if(board[i][j].value !=0 && (board[i-1][j].value ==0 || board[i][j].value === board[i-1][j].value))
+			if(board[i][j].value !== 0 && (board[i-1][j].value === 0 || board[i][j].value === board[i-1][j].value))
 			{
 				return true;
 			}
@@ -347,7 +348,7 @@ function canMoveDown()
 	{
 		for(var i=2;i>=0;i--)
 		{
-			if(board[i][j].value !=0 && (board[i+1][j].value ==0 || board[i][j].value == board[i+1][j].value))
+			if(board[i][j].value !== 0 && (board[i+1][j].value === 0 || board[i][j].value == board[i+1][j].value))
 			{
 				return true;
 			}
@@ -362,7 +363,7 @@ function canMoveRight()
 	{
 		for(var j=2;j>=0;j--)
 		{
-			if(board[i][j].value !=0 && (board[i][j+1].value ==0 || board[i][j].value == board[i][j+1].value))
+			if(board[i][j].value !==0 && (board[i][j+1].value === 0 || board[i][j].value === board[i][j+1].value))
 			{
 				return true;
 			}
@@ -402,7 +403,7 @@ function readyMove(boardData){
 			v.lastY = v.nextY;
 			v.lastValue = v.value;
 			return v;
-		})
+		});
 }
 function moveLeft(){
 	undoScore = score;
@@ -423,12 +424,12 @@ function moveLeft(){
 				temp.splice(j+1,1);
 			}
 		}
-		for(var j=0; j<4; j++){
+		for(j=0; j<4; j++){
 			if( j<temp.length){
 				board[i][j] = temp[j];
 				temp[j].nextX = j;
 			}else{
-				board[i][j] = new cellData();
+				board[i][j] = new CellData();
 			}
 		}
 		
@@ -438,7 +439,7 @@ function moveLeft(){
 function moveRight(){
 	undoScore = score;
 	for( var i=0; i<4; i++){
-		readyMove(board[i])
+		readyMove(board[i]);
 		var temp = board[i].filter(cutZero);
 		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
@@ -460,7 +461,7 @@ function moveRight(){
 		board[i] = board[i].concat(temp);
 		var k=0;
 		while(board[i].length<4){
-			board[i].unshift(new cellData());
+			board[i].unshift(new CellData());
 			k++;
 		}
 		for(; k<4; k++){
@@ -473,16 +474,18 @@ function moveRight(){
 function moveUp(){
 	undoScore = score;
 	var boardTemp = [];
-	for(var i=0; i<4; i++){
+	var i = 0,
+		j = 0;
+	for(i=0; i<4; i++){
 		boardTemp[i] = [];
-		for(var j=0; j<4; j++){
+		for(j=0; j<4; j++){
 			boardTemp[i][j] = board[j][i];
 		}
 	}
-	for( var i=0; i<4; i++){
+	for(i=0; i<4; i++){
 		readyMove(boardTemp[i]);
 		var temp = boardTemp[i].filter(cutZero);
-		for (var j = 0; j < temp.length-1; j++) {
+		for (j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
 				temp[j].lastValue = temp[j].value;
 				temp[j].value*=2;
@@ -497,18 +500,18 @@ function moveUp(){
 				temp.splice(j+1,1);
 			}
 		}
-		for(var j=0; j<4; j++){
+		for(j=0; j<4; j++){
 			if(j<temp.length){
-				boardTemp[i][j] = temp[j]
+				boardTemp[i][j] = temp[j];
 				boardTemp[i][j].nextY = j;
 			}else{
-				boardTemp[i][j] = new cellData();
+				boardTemp[i][j] = new CellData();
 			}
 		}
 		
 	}
-	for(var i=0; i<4; i++){
-		for(var j=0; j<4; j++){
+	for(i=0; i<4; i++){
+		for(j=0; j<4; j++){
 			board[i][j] = boardTemp[j][i];
 		}
 	}
@@ -517,16 +520,19 @@ function moveUp(){
 function moveDown(){
 	undoScore = score;
 	var boardTemp = [];
-	for(var i=0; i<4; i++){
+	var i = 0,
+		j = 0,
+		len = 0;
+	for(i=0; i<4; i++){
 		boardTemp[i] = [];
-		for(var j=0; j<4; j++){
+		for(j=0; j<4; j++){
 			boardTemp[i][j] = board[j][i];
 		}
 	}
-	for( var i=0; i<4; i++){
+	for(i=0; i<4; i++){
 		readyMove(boardTemp[i]);
 		var temp = boardTemp[i].filter(cutZero);
-		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
+		for (j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
 				temp[j].lastValue = temp[j].value;
 				temp[j].value*=2;
@@ -546,15 +552,15 @@ function moveDown(){
 		boardTemp[i] = boardTemp[i].concat(temp);
 		var k=0;
 		while(boardTemp[i].length<4){
-			boardTemp[i].unshift(new cellData());
+			boardTemp[i].unshift(new CellData());
 			k++;
 		}
 		for(;k<4;k++){
 			boardTemp[i][k].nextY = k;
 		}
 	}
-	for(var i=0; i<4; i++){
-		for(var j=0; j<4; j++){
+	for(i=0; i<4; i++){
+		for(j=0; j<4; j++){
 			board[i][j] = boardTemp[j][i];
 		}
 	}
