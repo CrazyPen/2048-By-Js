@@ -689,9 +689,10 @@ function getLocalBoard(){
 		localStorage.best = 0;
 	}
 	document.querySelector("#maxScore").textContent = localStorage.best;
+	console.log(!localStorage.score);
 	if( !localStorage.score){
 		localStorage.score = 0;
-		score = 0;
 	}
+	score = Number(localStorage.score);
 	updateScore();
 }
