@@ -169,6 +169,10 @@ function updateScore()
 {
 	document.querySelector("#myScore").textContent = score;
 	localStorage.score = score;
+	if( score > Number(localStorage.best)){
+		document.querySelector("#maxScore").textContent = score;
+		localStorage.best = score;
+	}
 }
 
 
@@ -380,7 +384,7 @@ function isGameOver()
 		setTimeout(function(){
 			document.querySelector("#over").style.display = "block";
 			document.querySelector("#finalScore").textContent = score;
-			localStorage.board = "undefined";
+			localStorage.board = undefined;
 			localStorage.score = 0;
 			if( score>localStorage.best ){
 				localStorage.best = score;
@@ -679,7 +683,7 @@ function setLocalBoard(){
 }
 
 function getLocalBoard(){
-	if(localStorage.board !== "undefined"){
+	if(localStorage.board != "undefined"){
 		board = JSON.parse(localStorage.board);
 		updateBoard();
 	}else{
