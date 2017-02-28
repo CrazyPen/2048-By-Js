@@ -5,6 +5,7 @@ var canUndo = false;
 var cellWidth = 110,
 	cellSpace = 16;
 var randomCell = {x:-1, y:-1};
+
 function CellData(){
 	this.lastY = -1;
 	this.lastX = -1;
@@ -683,7 +684,7 @@ function setLocalBoard(){
 }
 
 function getLocalBoard(){
-	if(localStorage.board != "undefined"){
+	if(typeof(localStorage.board)!="undefined"){
 		board = JSON.parse(localStorage.board);
 		updateBoard();
 	}else{
