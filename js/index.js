@@ -1,14 +1,15 @@
 "use strict";
-function _2048(){
-	
-}
+//store current score and previous score
 var score = 0,
-	undoScore = 0;
+	preScore = 0;
+//can undo or not
 var canUndo = false;
+//every cell's width and space's width
 var cellWidth = 110,
 	cellSpace = 16;
 var randomCell = {x:-1, y:-1};
 
+//store every cell's location and value(include current', previous',next')
 function CellData(){
 	this.lastY = -1;
 	this.lastX = -1;
@@ -20,6 +21,8 @@ function CellData(){
 	this.nextX = -1;
 	this.value = 0;
 } 
+
+//store board's data
 var board=[];
 for(var i=0;i<4;i++)
 {
@@ -29,80 +32,87 @@ for(var i=0;i<4;i++)
 		board[i][j]=new CellData();
 	}
 }
-var view = document.querySelector("#view");
+
 
 //绘制方格
 setCss();
 getLocalBoard();
+addMyEventListener();
 
-document.querySelector("#restart").addEventListener("click",newGame);
-document.querySelector("#start").addEventListener("click", function(){
-	newGame();
-	document.querySelector("#over").style.display = "none";
-});
-document.querySelector("#undo").addEventListener("click", undo);
 
-document.addEventListener("keydown",function(event){
-	if(event.which==37)
-	{
-		event.preventDefault();
-		if(canMoveLeft())
+function addMyEventListener(){
+	document.querySelector("#restart").addEventListener("click",newGame);
+	document.querySelector("#start").addEventListener("click", function(){
+		newGame();
+		document.querySelector("#over").style.display = "none";
+	});
+	document.querySelector("#undo").addEventListener("click", undo);
+
+	//add keyboard event
+	document.addEventListener("keydown",function(event){
+		if(event.which==37)
 		{
-			moveLeft();
+			event.preventDefault();
+			if(canMoveLeft())
+			{
+				moveLeft();
+			}
 		}
-	}
-	if(event.which==38)
-	{
-		event.preventDefault();
-		if(canMoveUp())
+		if(event.which==38)
 		{
-			moveUp();
+			event.preventDefault();
+			if(canMoveUp())
+			{
+				moveUp();
+			}
 		}
-	}
-	if(event.which==39)
-	{
-		event.preventDefault();
-		if(canMoveRight())
+		if(event.which==39)
 		{
-			moveRight();
+			event.preventDefault();
+			if(canMoveRight())
+			{
+				moveRight();
+			}
 		}
-	}
-	if(event.which==40)
-	{
-		event.preventDefault();
-		if(canMoveDown())
+		if(event.which==40)
 		{
-			moveDown();
+			event.preventDefault();
+			if(canMoveDown())
+			{
+				moveDown();
+			}
+			
 		}
+	});
+
+	//add touch event
+	var isTouchDown=0;
+	var startX = 0,
+		startY = 0;
+	var view = document.querySelector("#view");
+	view.addEventListener("touchstart",function(e){
+		e.preventDefault();
 		
-	}
-});
+		startX=e.changedTouches[0].pageX;
+		startY=e.changedTouches[0].pageY;
+		isTouchDown=1;
+	});
 
-var isTouchDown=0;
-var startX = 0,
-	startY = 0;
-view.addEventListener("touchstart",function(e){
-	e.preventDefault();
-	
-	startX=e.changedTouches[0].pageX;
-	startY=e.changedTouches[0].pageY;
-	isTouchDown=1;
-});
+	view.addEventListener("touchend",function(e){
+		e.preventDefault();
 
-view.addEventListener("touchend",function(e){
-	e.preventDefault();
+	if(isTouchDown != 1)
+		return;
 
-if(isTouchDown != 1)
-	return;
+	var endX = e.changedTouches[0].pageX;
+	var endY = e.changedTouches[0].pageY;
 
-var endX = e.changedTouches[0].pageX;
-var endY = e.changedTouches[0].pageY;
-
-var dX= endX - startX;
-var dY= endY - startY;
-if(Math.abs(dX)<50 && Math.abs(dY)<50){
-	return;
-}else{ if(Math.abs(dX) > Math.abs(dY))
+	var dX= endX - startX;
+	var dY= endY - startY;
+	if(Math.abs(dX)<50 && Math.abs(dY)<50){
+		return;
+	}else{ 
+		if(Math.abs(dX) > Math.abs(dY))
 		{
 			if(dX>0 && canMoveRight())
 			{
@@ -125,9 +135,12 @@ if(Math.abs(dX)<50 && Math.abs(dY)<50){
 				moveUp();
 				isTouchDown=0;
 			}
-		}}
-});
+		}
+	}
+	});
+}
 
+//init board css according screen width
 function setCss()
 {
 	var cells = document.createDocumentFragment();
@@ -161,6 +174,8 @@ function setCss()
 	
 	view.appendChild(cells);
 }
+
+//get best score from localStorage
 function getBest(){
 	if(typeof(Storage) !== "undefined"){
 		if(!localStorage.best){
@@ -169,6 +184,8 @@ function getBest(){
 		document.querySelector("#maxScore").textContent = localStorage.best;
 	}
 }
+
+//update current score after every step
 function updateScore()
 {
 	document.querySelector("#myScore").textContent = score;
@@ -181,7 +198,7 @@ function updateScore()
 
 
 
-
+//start a new game
 function newGame()
 {
 	score=0;
@@ -195,6 +212,7 @@ function newGame()
 	updateBoard();
 }
 
+//clear board and data in order to start a game
 function clearBoard()
 {
 	removeCons();
@@ -209,6 +227,7 @@ function clearBoard()
 	updateBoard();
 }
 
+//update a cell randomly
 function randomNumber()
 {
 	while(true)
@@ -388,7 +407,7 @@ function isGameOver()
 		setTimeout(function(){
 			document.querySelector("#over").style.display = "block";
 			document.querySelector("#finalScore").textContent = score;
-			localStorage.board = undefined;
+			localStorage.remove("board");
 			localStorage.score = 0;
 			if( score>localStorage.best ){
 				localStorage.best = score;
@@ -414,7 +433,7 @@ function readyMove(boardData){
 		});
 }
 function moveLeft(){
-	undoScore = score;
+	preScore = score;
 	for( var i=0; i<4; i++){
 		readyMove(board[i]);
 		var temp = board[i].filter(cutZero);
@@ -445,7 +464,7 @@ function moveLeft(){
 	slideAnimate();
 }
 function moveRight(){
-	undoScore = score;
+	preScore = score;
 	for( var i=0; i<4; i++){
 		readyMove(board[i]);
 		var temp = board[i].filter(cutZero);
@@ -480,7 +499,7 @@ function moveRight(){
 	slideAnimate();
 }
 function moveUp(){
-	undoScore = score;
+	preScore = score;
 	var boardTemp = [];
 	var i = 0,
 		j = 0;
@@ -526,7 +545,7 @@ function moveUp(){
 	slideAnimate();
 }
 function moveDown(){
-	undoScore = score;
+	preScore = score;
 	var boardTemp = [];
 	var i = 0,
 		j = 0,
@@ -652,7 +671,7 @@ function undo(){
 	}
 	view.appendChild(cons);
 
-	score = undoScore;
+	score = preScore;
 
 	setTimeout(function(){
 		for(var i=0; i<4; i++){
@@ -685,6 +704,7 @@ function setLocalBoard(){
 	var localBoard = JSON.stringify(board);
 	localStorage.board = localBoard;
 }
+
 
 function getLocalBoard(){
 	if(typeof(localStorage.board)!="undefined"){

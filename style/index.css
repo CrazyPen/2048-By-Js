@@ -119,6 +119,7 @@ p#info {
 	line-height: 110px;
 	text-align: center;
 	font-size: 80px;
+	border-radius: 5px;
 }
 .con{
 	transition: all 0.2s, width 0.2s, height 0.2s, top 0.2s, left 0.2s;
@@ -146,6 +147,7 @@ button#restart{
 }
 button#undo{
 	right: 120px;
+	background: #CECECE;
 }
 
 @media screen and (max-width: 500px){
