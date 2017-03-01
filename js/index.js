@@ -1,4 +1,7 @@
 "use strict";
+function _2048(){
+	
+}
 var score = 0,
 	undoScore = 0;
 var canUndo = false;
