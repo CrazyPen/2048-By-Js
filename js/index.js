@@ -3,7 +3,7 @@
 var score = 0,
 	preScore = 0;
 //can undo or not
-var canUndo = false;
+var canUndo = true;
 //every cell's width and space's width
 var cellWidth = 110,
 	cellSpace = 16;
@@ -37,7 +37,10 @@ for(var i=0;i<4;i++)
 
 //绘制方格
 initCss();
-getLocalBoard();
+if(!getLocalBoard()){
+	newGame();
+}
+getBest();
 addMyEventListener();
 
 
@@ -209,11 +212,17 @@ function newGame()
 	updateScore();
 	getBest();
 	clearBoard();
+	localStorage.removeItem("board");
 
 	getRandomNumber();
 	getRandomNumber();
+	localStorage.removeItem("random");
 
-	updateBoard();
+	document.querySelector("#undo").setAttribute("disabled", "true");
+	document.querySelector("#undo").style.backgroundColor = "#CECECE";
+
+	updateBoardView();
+
 }
 
 //clear board and data in order to start a game
@@ -228,7 +237,7 @@ function clearBoard()
 			board[i][j]=new CellData();
 		}
 	}
-	updateBoard();
+	updateBoardView();
 }
 
 //update a cell randomly
@@ -246,8 +255,11 @@ function getRandomNumber()
 			board[h][l].lastY = board[h][l].nextY = h;
 			
 			showRandomCell(h, l);
+
 			randomCell.x = l;
 			randomCell.y = h;
+			localStorage.random = JSON.stringify(randomCell);
+
 			break;
 		}
 		
@@ -260,6 +272,8 @@ function showRandomCell(h, l){
 	con.setAttribute("id", "con-"+h+"-"+l);
 	con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
 	con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
+	con.style.width = cellWidth + 'px';
+	con.style.height = cellWidth + 'px';
 	con.style.transform = "scale(0,0)";
 	con.style.lineHeight = cellWidth+"px";
 	con.style.backgroundColor = numberBgColor(board[h][l].value);
@@ -283,7 +297,7 @@ function removeCons(){
 	}
 }
 
-function updateBoard()
+function updateBoardView()
 {
 	removeCons();
 		
@@ -367,22 +381,6 @@ function canMove(direction) {
 	return false;
 }
 
-function isGameOver()
-{
-	if(canMoveUp() || canMoveDown() || canMoveRight() || canMoveLeft()){
-		return false;
-	}else{
-		setTimeout(function(){
-			document.querySelector("#over").style.display = "block";
-			document.querySelector("#finalScore").textContent = score;
-			localStorage.remove("board");
-			localStorage.score = 0;
-			if( score>localStorage.best ){
-				localStorage.best = score;
-			}
-		},300);
-	}
-}
 function cutZero(v){
 	return v.value>0;
 }
@@ -608,7 +606,6 @@ function slideAnimate(){
 				var con = document.querySelector("#con-"+board[i][j].lastY+"-"+board[i][j].lastX);
 				con.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
 				con.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
-
 				if( board[i][j].lastValue1){
 					var con1 = document.querySelector("#con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
 					con1.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
@@ -619,22 +616,22 @@ function slideAnimate(){
 	}
 	
 	setTimeout(function(){
-		updateBoard();
+		updateBoardView();
 		getRandomNumber();
-		setLocalBoard();
+		localStorage.board = JSON.stringify(board);
 		updateScore();
-		if(canMove()){
+		if(!canMove()){
 			setTimeout(function(){
 				document.querySelector("#over").style.display = "block";
 				document.querySelector("#finalScore").textContent = score;
-				localStorage.remove("board");
+				localStorage.removeItem("board");
 				localStorage.score = 0;
 				if( score>localStorage.best ){
 					localStorage.best = score;
 				}
 			},300);
 		}
-	}, 200);
+	}, 150);
 }
 function undo(){
 	if( !canUndo){
@@ -647,9 +644,13 @@ function undo(){
 	board[randomCell.y][randomCell.x].value = 0;
 	board[randomCell.y][randomCell.x].lastX = board[randomCell.y][randomCell.x].nextX = -1;
 	board[randomCell.y][randomCell.x].lastY = board[randomCell.y][randomCell.x].nextY = -1;
-	var	cons = document.createDocumentFragment();
+	
+	document.querySelector("#con-"+randomCell.y+"-"+randomCell.x).style.transform = "scale(0,0)";
 
-	view.removeChild(document.querySelector("#con-"+randomCell.y+"-"+randomCell.x));
+	setTimeout(function(){
+		view.removeChild(document.querySelector("#con-"+randomCell.y+"-"+randomCell.x));}, 150);
+
+	var	cons = document.createDocumentFragment();
 	for (var i = 0; i < 4; i++) {
 		for (var j = 0; j < 4; j++) {
 			if( board[i][j].value){
@@ -709,28 +710,19 @@ function undo(){
 	
 }
 
-function setLocalBoard(){
-	if( typeof(Storage) === "undefined")
-		return ;
-	var localBoard = JSON.stringify(board);
-	localStorage.board = localBoard;
-}
-
-
-function getLocalBoard(){
-	if(typeof(localStorage.board)!="undefined"){
+function getLocalBoard() {
+	if( typeof(localStorage.board)!="undefined"){
 		board = JSON.parse(localStorage.board);
-		updateBoard();
+		updateBoardView();
+
+		randomCell = JSON.parse(localStorage.random);
+		canUndo = true;
+
+		score = Number(localStorage.score);
+		document.querySelector("#myScore").textContent = score;
+
+		return true;
 	}else{
-		newGame();
+		return false;
 	}
-	if(!localStorage.best){
-		localStorage.best = 0;
-	}
-	document.querySelector("#maxScore").textContent = localStorage.best;
-	if( !localStorage.score){
-		localStorage.score = 0;
-	}
-	score = Number(localStorage.score);
-	updateScore();
 }

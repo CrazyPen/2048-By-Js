@@ -79,7 +79,7 @@ p#info {
 	height: 520px;
 	display: none;
 
-	background-color: rgba(139, 115, 85, 0.7);
+	background-color: rgba(139, 115, 85, 0.5);
 }
 #over p {
 	position: absolute;
@@ -147,7 +147,7 @@ button#restart{
 }
 button#undo{
 	right: 120px;
-	background: #CECECE;
+	background: #8f7a66;
 }
 
 @media screen and (max-width: 500px){
@@ -165,6 +165,7 @@ button#undo{
 	P#info{
 		top: 80px;
 		left: 10px;
+		width: 140px;
 	}
 	#over p {
 		font-size: 40px;
