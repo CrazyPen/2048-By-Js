@@ -36,7 +36,7 @@ for(var i=0;i<4;i++)
 
 
 //绘制方格
-setCss();
+initCss();
 getLocalBoard();
 addMyEventListener();
 
@@ -92,7 +92,7 @@ function addMyEventListener(){
 		startY = 0;
 	
 	var view = document.querySelector("#view");
-	view.addEventListener("touchstart",function(e){
+	document.addEventListener("touchstart",function(e){
 		e.preventDefault();
 		
 		startX=e.changedTouches[0].pageX;
@@ -100,7 +100,7 @@ function addMyEventListener(){
 		isTouchDown=1;
 	});
 
-	view.addEventListener("touchend",function(e){
+	document.addEventListener("touchend",function(e){
 		e.preventDefault();
 
 	if(isTouchDown != 1)
@@ -116,23 +116,23 @@ function addMyEventListener(){
 	}else{ 
 		if(Math.abs(dX) > Math.abs(dY))
 		{
-			if(dX>0 && canMoveRight())
+			if(dX>0 && canMove('right'))
 			{
 				moveRight();
 				isTouchDown=0;
-			}else if(dX<0 && canMoveLeft())
+			}else if(dX<0 && canMove('left'))
 			{
 				moveLeft();
 				isTouchDown=0;
 			}
 		}else if(Math.abs(dX) <= Math.abs(dY))
 		{
-			if(canMoveDown() && dY>0)
+			if(canMove('down') && dY>0)
 			{
 				moveDown();
 				isTouchDown=0;
 			}																
-			else if(canMoveUp() && dY<0)
+			else if(canMove('up') && dY<0)
 			{
 				moveUp();
 				isTouchDown=0;
@@ -143,10 +143,10 @@ function addMyEventListener(){
 }
 
 //init board css according screen width
-function setCss()
+function initCss()
 {
 	var view = document.querySelector("#view");
-	var cells = document.createDocumentFragment();
+	
 	var clientWidth = document.body.clientWidth;
 	if(clientWidth<500)
 	{
@@ -163,6 +163,7 @@ function setCss()
 		cellSpace = (clientWidth-20)*0.04;
 	}
 	
+	var cells = document.createDocumentFragment();
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
 			var cell = document.createElement("div");
@@ -209,8 +210,8 @@ function newGame()
 	getBest();
 	clearBoard();
 
-	randomNumber();
-	randomNumber();
+	getRandomNumber();
+	getRandomNumber();
 
 	updateBoard();
 }
@@ -231,7 +232,7 @@ function clearBoard()
 }
 
 //update a cell randomly
-function randomNumber()
+function getRandomNumber()
 {
 	while(true)
 	{
@@ -244,7 +245,7 @@ function randomNumber()
 			board[h][l].lastX = board[h][l].nextX = l;
 			board[h][l].lastY = board[h][l].nextY = h;
 			
-			showOneCell(h, l);
+			showRandomCell(h, l);
 			randomCell.x = l;
 			randomCell.y = h;
 			break;
@@ -253,14 +254,13 @@ function randomNumber()
 	}
 }
 
-function showOneCell(h, l){
+function showRandomCell(h, l){
 	var con = document.createElement("div");
 	con.setAttribute("class", "cell con");
 	con.setAttribute("id", "con-"+h+"-"+l);
-	con.style.top = cellSpace*(h+1)+cellWidth*(h+0.5)+"px";
-	con.style.left = cellSpace*(l+1)+cellWidth*(l+0.5)+"px";
-	con.style.width = 0+"px";
-	con.style.height = 0+"px";
+	con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
+	con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
+	con.style.transform = "scale(0,0)";
 	con.style.lineHeight = cellWidth+"px";
 	con.style.backgroundColor = numberBgColor(board[h][l].value);
 	if(board[h][l].value>100 && board[h][l].value<1000){
@@ -271,11 +271,8 @@ function showOneCell(h, l){
 	con.textContent = board[h][l].value;
 	view.appendChild(con);
 	setTimeout(function(){
-		con.style.width = cellWidth+"px";
-		con.style.height = cellWidth+"px";
-		con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
-		con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
-	},10);
+		con.style.transform = "scale(1,1)";
+	},100);
 }
 function removeCons(){
 	var cons = document.querySelectorAll(".con");
@@ -368,66 +365,6 @@ function canMove(direction) {
 		}
 	}
 	return false;
-};
-function canMoveLeft()
-{
-	for(var i=0;i<4;i++)
-	{
-		for(var j=1;j<4;j++)
-		{
-			if(board[i][j].value !==0 && (board[i][j-1].value ===0 || board[i][j].value === board[i][j-1].value))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-
-}
-
-function canMoveUp()
-{
-	for(var j=0;j<4;j++)
-	{
-		for(var i=1;i<4;i++)
-		{
-			if(board[i][j].value !== 0 && (board[i-1][j].value === 0 || board[i][j].value === board[i-1][j].value))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-function canMoveDown()
-{
-	for(var j=0;j<4;j++)
-	{
-		for(var i=2;i>=0;i--)
-		{
-			if(board[i][j].value !== 0 && (board[i+1][j].value === 0 || board[i][j].value == board[i+1][j].value))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-function canMoveRight()
-{
-	for(var i=0;i<4;i++)
-	{
-		for(var j=2;j>=0;j--)
-		{
-			if(board[i][j].value !==0 && (board[i][j+1].value === 0 || board[i][j].value === board[i][j+1].value))
-			{
-				return true;
-			}
-		}
-	}
-	return false;
 }
 
 function isGameOver()
@@ -450,23 +387,23 @@ function cutZero(v){
 	return v.value>0;
 }
 
-//移动前的准备
-function readyMove(boardData){
-	boardData = boardData.map(function (v) {
-			v.latX1 = -1;
-			v.lastY1 = -1;
-			v.lastValue1 = 0;
 
-			v.lastX = v.nextX;
-			v.lastY = v.nextY;
-			v.lastValue = v.value;
-			return v;
-		});
-}
 function moveLeft(){
 	preScore = score;
+	board = board.map(function(h){
+		return h.map(function(l) {
+			l.latX1 = -1;
+			l.lastY1 = -1;
+			l.lastValue1 = 0;
+
+			l.lastX = l.nextX;
+			l.lastY = l.nextY;
+			l.lastValue = l.value;
+			return l;
+		});
+	});
 	for( var i=0; i<4; i++){
-		readyMove(board[i]);
+
 		var temp = board[i].filter(cutZero);
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
@@ -496,8 +433,19 @@ function moveLeft(){
 }
 function moveRight(){
 	preScore = score;
+	board = board.map(function(h){
+		return h.map(function(l) {
+			l.latX1 = -1;
+			l.lastY1 = -1;
+			l.lastValue1 = 0;
+
+			l.lastX = l.nextX;
+			l.lastY = l.nextY;
+			l.lastValue = l.value;
+			return l;
+		});
+	});
 	for( var i=0; i<4; i++){
-		readyMove(board[i]);
 		var temp = board[i].filter(cutZero);
 		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
@@ -531,6 +479,18 @@ function moveRight(){
 }
 function moveUp(){
 	preScore = score;
+	board = board.map(function(h){
+		return h.map(function(l) {
+			l.latX1 = -1;
+			l.lastY1 = -1;
+			l.lastValue1 = 0;
+
+			l.lastX = l.nextX;
+			l.lastY = l.nextY;
+			l.lastValue = l.value;
+			return l;
+		});
+	});
 	var boardTemp = [];
 	var i = 0,
 		j = 0;
@@ -541,7 +501,6 @@ function moveUp(){
 		}
 	}
 	for(i=0; i<4; i++){
-		readyMove(boardTemp[i]);
 		var temp = boardTemp[i].filter(cutZero);
 		for (j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
@@ -577,6 +536,18 @@ function moveUp(){
 }
 function moveDown(){
 	preScore = score;
+	board = board.map(function(h){
+		return h.map(function(l) {
+			l.latX1 = -1;
+			l.lastY1 = -1;
+			l.lastValue1 = 0;
+
+			l.lastX = l.nextX;
+			l.lastY = l.nextY;
+			l.lastValue = l.value;
+			return l;
+		});
+	});
 	var boardTemp = [];
 	var i = 0,
 		j = 0,
@@ -588,7 +559,6 @@ function moveDown(){
 		}
 	}
 	for(i=0; i<4; i++){
-		readyMove(boardTemp[i]);
 		var temp = boardTemp[i].filter(cutZero);
 		for (j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
@@ -650,10 +620,20 @@ function slideAnimate(){
 	
 	setTimeout(function(){
 		updateBoard();
-		randomNumber();
+		getRandomNumber();
 		setLocalBoard();
 		updateScore();
-		isGameOver();
+		if(canMove()){
+			setTimeout(function(){
+				document.querySelector("#over").style.display = "block";
+				document.querySelector("#finalScore").textContent = score;
+				localStorage.remove("board");
+				localStorage.score = 0;
+				if( score>localStorage.best ){
+					localStorage.best = score;
+				}
+			},300);
+		}
 	}, 200);
 }
 function undo(){
