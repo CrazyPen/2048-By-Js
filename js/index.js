@@ -8,6 +8,7 @@ var canUndo = false;
 var cellWidth = 110,
 	cellSpace = 16;
 var randomCell = {x:-1, y:-1};
+var view = document.querySelector("#view");
 
 //store every cell's location and value(include current', previous',next')
 function CellData(){
@@ -53,7 +54,7 @@ function addMyEventListener(){
 		if(event.which==37)
 		{
 			event.preventDefault();
-			if(canMoveLeft())
+			if(canMove('left'))
 			{
 				moveLeft();
 			}
@@ -61,7 +62,7 @@ function addMyEventListener(){
 		if(event.which==38)
 		{
 			event.preventDefault();
-			if(canMoveUp())
+			if(canMove('up'))
 			{
 				moveUp();
 			}
@@ -69,7 +70,7 @@ function addMyEventListener(){
 		if(event.which==39)
 		{
 			event.preventDefault();
-			if(canMoveRight())
+			if(canMove('right'))
 			{
 				moveRight();
 			}
@@ -77,7 +78,7 @@ function addMyEventListener(){
 		if(event.which==40)
 		{
 			event.preventDefault();
-			if(canMoveDown())
+			if(canMove('down'))
 			{
 				moveDown();
 			}
@@ -89,6 +90,7 @@ function addMyEventListener(){
 	var isTouchDown=0;
 	var startX = 0,
 		startY = 0;
+	
 	var view = document.querySelector("#view");
 	view.addEventListener("touchstart",function(e){
 		e.preventDefault();
@@ -143,6 +145,7 @@ function addMyEventListener(){
 //init board css according screen width
 function setCss()
 {
+	var view = document.querySelector("#view");
 	var cells = document.createDocumentFragment();
 	var clientWidth = document.body.clientWidth;
 	if(clientWidth<500)
@@ -337,7 +340,35 @@ function numberBgColor(num)
 		default:return "#191970";
 	}
 }
-
+function canMove(direction) {
+	for(var i=0;i<4;i++)
+	{
+		for(var j=1;j<4;j++)
+		{
+			if( direction === 'left'){
+				if ( board[i][j].value !==0 && (board[i][j-1].value ===0 || board[i][j].value === board[i][j-1].value) )
+				{
+					return true;
+				}
+			}else if ( direction === 'right') {
+				if(board[i][3-j].value !==0 && (board[i][4-j].value ===0 || board[i][3-j].value === board[i][4-j].value)){
+					return true;
+				}
+			}else if( direction === 'up'){
+				if(board[j][i].value !==0 && (board[j-1][i].value ===0 || board[j][i].value === board[j-1][i].value)){
+					return true;
+				}
+			}else if( direction === 'down'){
+				if(board[3-j][i].value !==0 && (board[4-j][i].value ===0 || board[3-j][i].value === board[4-j][i].value)){
+					return true;
+				}
+			}else{
+				return canMove('left') || canMove('right') || canMove('up') || canMove('down');
+			}
+		}
+	}
+	return false;
+};
 function canMoveLeft()
 {
 	for(var i=0;i<4;i++)
