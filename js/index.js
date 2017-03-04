@@ -95,7 +95,7 @@ function addMyEventListener(){
 		startY = 0;
 	
 	var view = document.querySelector("#view");
-	document.addEventListener("touchstart",function(e){
+	view.addEventListener("touchstart",function(e){
 		e.preventDefault();
 		
 		startX=e.changedTouches[0].pageX;
@@ -103,7 +103,7 @@ function addMyEventListener(){
 		isTouchDown=1;
 	});
 
-	document.addEventListener("touchend",function(e){
+	view.addEventListener("touchend",function(e){
 		e.preventDefault();
 
 	if(isTouchDown != 1)
