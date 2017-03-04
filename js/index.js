@@ -1,26 +1,26 @@
 "use strict";
 //store current score and previous score
-var score = 0,
-	preScore = 0;
+var score      = 0;
+var	preScore   = 0;
 //can undo or not
-var canUndo = true;
+var canUndo    = true;
 //every cell's width and space's width
-var cellWidth = 110,
-	cellSpace = 16;
+var cellWidth  = 110;
+var	cellSpace  = 16;
 var randomCell = {x:-1, y:-1};
-var view = document.querySelector("#view");
+var view       = document.querySelector("#view");
 
 //store every cell's location and value(include current', previous',next')
 function CellData(){
-	this.lastY = -1;
-	this.lastX = -1;
-	this.lastValue = 0;
-	this.lastX1= -1;
-	this.lastY1= -1;
-	this.lastValue1 =0;
-	this.nextY = -1;
-	this.nextX = -1;
-	this.value = 0;
+	this.lastY      = -1;
+	this.lastX      = -1;
+	this.lastValue  = 0;
+	this.lastX1     = -1;
+	this.lastY1     = -1;
+	this.lastValue1 = 0;
+	this.nextY      = -1;
+	this.nextX      = -1;
+	this.value      = 0;
 } 
 
 //store board's data
@@ -30,7 +30,7 @@ for(var i=0;i<4;i++)
 	board[i] =[];
 	for(var j=0;j<4;j++)
 	{
-		board[i][j]=new CellData();
+		board[i][j] = new CellData();
 	}
 }
 
@@ -90,17 +90,17 @@ function addMyEventListener(){
 	});
 
 	//add touch event
-	var isTouchDown=0;
-	var startX = 0,
-		startY = 0;
+	var isTouchDown = 0;
+	var startX      = 0,
+		startY      = 0;
 	
 	var view = document.querySelector("#view");
 	view.addEventListener("touchstart",function(e){
 		e.preventDefault();
 		
-		startX=e.changedTouches[0].pageX;
-		startY=e.changedTouches[0].pageY;
-		isTouchDown=1;
+		startX      = e.changedTouches[0].pageX;
+		startY      = e.changedTouches[0].pageY;
+		isTouchDown = 1;
 	});
 
 	view.addEventListener("touchend",function(e){
@@ -112,8 +112,8 @@ function addMyEventListener(){
 	var endX = e.changedTouches[0].pageX;
 	var endY = e.changedTouches[0].pageY;
 
-	var dX= endX - startX;
-	var dY= endY - startY;
+	var dX = endX - startX;
+	var dY = endY - startY;
 	if(Math.abs(dX)<50 && Math.abs(dY)<50){
 		return;
 	}else{ 
@@ -122,23 +122,23 @@ function addMyEventListener(){
 			if(dX>0 && canMove('right'))
 			{
 				moveRight();
-				isTouchDown=0;
+				isTouchDown = 0;
 			}else if(dX<0 && canMove('left'))
 			{
 				moveLeft();
-				isTouchDown=0;
+				isTouchDown = 0;
 			}
 		}else if(Math.abs(dX) <= Math.abs(dY))
 		{
-			if(canMove('down') && dY>0)
+			if( canMove('down') && dY>0 )
 			{
 				moveDown();
-				isTouchDown=0;
+				isTouchDown = 0;
 			}																
-			else if(canMove('up') && dY<0)
+			else if( canMove('up') && dY<0 )
 			{
 				moveUp();
-				isTouchDown=0;
+				isTouchDown = 0;
 			}
 		}
 	}
@@ -148,32 +148,32 @@ function addMyEventListener(){
 //init board css according screen width
 function initCss()
 {
-	var view = document.querySelector("#view");
+	var view        = document.querySelector("#view");
 	
 	var clientWidth = document.body.clientWidth;
 	if(clientWidth<500)
 	{
-		document.querySelector("#game").style.width = clientWidth+"px";
+		document.querySelector("#game").style.width  = clientWidth+"px";
 		document.querySelector("#game").style.height = clientWidth+125+"px";
-		view.style.width = clientWidth-20+"px";
+		view.style.width  = clientWidth-20+"px";
 		view.style.height = clientWidth-20+"px";
-
-		var over = document.querySelector("#over");
-		over.style.width = clientWidth-20+"px";
+		
+		var over          = document.querySelector("#over");
+		over.style.width  = clientWidth-20+"px";
 		over.style.height = clientWidth-20+"px";
-
-		cellWidth = (clientWidth-20)*0.2;
-		cellSpace = (clientWidth-20)*0.04;
+		
+		cellWidth         = (clientWidth-20)*0.2;
+		cellSpace         = (clientWidth-20)*0.04;
 	}
 	
 	var cells = document.createDocumentFragment();
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
-			var cell = document.createElement("div");
+			var cell          = document.createElement("div");
 			cell.setAttribute("class", "cell");
-			cell.style.top = cellSpace*(i+1)+cellWidth*i+"px";
-			cell.style.left = cellSpace*(j+1)+cellWidth*j+"px";
-			cell.style.width = cellWidth+"px";
+			cell.style.top    = cellSpace*(i+1)+cellWidth*i+"px";
+			cell.style.left   = cellSpace*(j+1)+cellWidth*j+"px";
+			cell.style.width  = cellWidth+"px";
 			cell.style.height = cellWidth+"px";
 			cells.appendChild(cell);
 		}
@@ -250,7 +250,7 @@ function getRandomNumber()
 
 		if(board[h][l].value===0)
 		{
-			board[h][l].value=(Math.random()>0.5?2:4);
+			board[h][l].value = (Math.random()>0.5?2:4);
 			board[h][l].lastX = board[h][l].nextX = l;
 			board[h][l].lastY = board[h][l].nextY = h;
 			
@@ -270,12 +270,12 @@ function showRandomCell(h, l){
 	var con = document.createElement("div");
 	con.setAttribute("class", "cell con");
 	con.setAttribute("id", "con-"+h+"-"+l);
-	con.style.top = cellSpace*(h+1)+cellWidth*h+"px";
-	con.style.left = cellSpace*(l+1)+cellWidth*l+"px";
-	con.style.width = cellWidth + 'px';
-	con.style.height = cellWidth + 'px';
-	con.style.transform = "scale(0,0)";
-	con.style.lineHeight = cellWidth+"px";
+	con.style.top             = cellSpace*(h+1)+cellWidth*h+"px";
+	con.style.left            = cellSpace*(l+1)+cellWidth*l+"px";
+	con.style.width           = cellWidth + 'px';
+	con.style.height          = cellWidth + 'px';
+	con.style.transform       = "scale(0,0)";
+	con.style.lineHeight      = cellWidth+"px";
 	con.style.backgroundColor = numberBgColor(board[h][l].value);
 	if(board[h][l].value>100 && board[h][l].value<1000){
 		con.style.fontSize = cellWidth>100?"60px":"40px";
@@ -311,11 +311,11 @@ function updateBoardView()
 				var con = document.createElement("div");
 				con.setAttribute("class", "cell con");
 				con.setAttribute("id", "con-"+i+"-"+j);
-				con.style.top = cellSpace*(i+1)+cellWidth*i+"px";
-				con.style.left = cellSpace*(j+1)+cellWidth*j+"px";
-				con.style.width = cellWidth+"px";
-				con.style.height = cellWidth+"px";
-				con.style.lineHeight = cellWidth+"px";
+				con.style.top             = cellSpace*(i+1)+cellWidth*i+"px";
+				con.style.left            = cellSpace*(j+1)+cellWidth*j+"px";
+				con.style.width           = cellWidth+"px";
+				con.style.height          = cellWidth+"px";
+				con.style.lineHeight      = cellWidth+"px";
 				con.style.backgroundColor = numberBgColor(board[i][j].value);
 				if(board[i][j].value>100 && board[i][j].value<1000){
 					con.style.fontSize = cellWidth>100?"60px":"40px";
@@ -335,20 +335,20 @@ function numberBgColor(num)
 {
 	switch (num)
 	{
-		case 2:return "#DEDCDC" ;
-		case 4:return "#E4E0B4" ;
-		case 8:return "#f2b179" ;
-		case 16:return "#FFA500" ;
-		case 32:return "#F75F08" ;
-		case 64:return "#F82008" ;
-		case 128:return "#9DF30C" ;
-		case 256:return "#09FA26" ;
-		case 512:return "#0DFBA7" ;
-		case 1024:return "#0FE0FA" ;
-		case 2048:return "#0B84F2" ;
-		case 4096:return "#0C4BFA" ;
-		case 8192:return "#BD10F8" ;
-		default:return "#191970";
+		case 2:return "#EFEFEF" ;
+		case 4:return "#E6DFBB" ;
+		case 8:return "#FECEA8" ;
+		case 16:return "#FCCB70" ;
+		case 32:return "#FFD5BC" ;
+		case 64:return "#F7D396" ;
+		case 128:return "#F6E67B" ;
+		case 256:return "#FAD14A" ;
+		case 512:return "#FBD70D" ;
+		case 1024:return "#FABA0F" ;
+		case 2048:return "#F2970B" ;
+		case 4096:return "#FA710C" ;
+		case 8192:return "#F86E10" ;
+		default:return "#C54A19";
 	}
 }
 function canMove(direction) {
@@ -390,13 +390,13 @@ function moveLeft(){
 	preScore = score;
 	board = board.map(function(h){
 		return h.map(function(l) {
-			l.latX1 = -1;
-			l.lastY1 = -1;
+			l.latX1      = -1;
+			l.lastY1     = -1;
 			l.lastValue1 = 0;
-
-			l.lastX = l.nextX;
-			l.lastY = l.nextY;
-			l.lastValue = l.value;
+			
+			l.lastX      = l.nextX;
+			l.lastY      = l.nextY;
+			l.lastValue  = l.value;
 			return l;
 		});
 	});
@@ -405,24 +405,24 @@ function moveLeft(){
 		var temp = board[i].filter(cutZero);
 		for (var j = 0; j < temp.length-1; j++) {
 			if(temp[j].value===temp[j+1].value){
-				temp[j].lastValue = temp[j].value;
-				temp[j].value*=2;
-				temp[j].nextX = j;
-
-				score+=temp[j].value;
+				temp[j].lastValue  = temp[j].value;
+				temp[j].value     *= 2;
+				temp[j].nextX      = j;
+				
+				score             += temp[j].value;
 				
 				temp[j].lastValue1 = temp[j+1].value;
-				temp[j].lastX1 = temp[j+1].nextX;
-				temp[j].lastY1 = temp[j+1].nextY;
+				temp[j].lastX1     = temp[j+1].nextX;
+				temp[j].lastY1     = temp[j+1].nextY;
 				temp.splice(j+1,1);
 			}
 		}
 		for(j=0; j<4; j++){
 			if( j<temp.length){
-				board[i][j] = temp[j];
+				board[i][j]   = temp[j];
 				temp[j].nextX = j;
 			}else{
-				board[i][j] = new CellData();
+				board[i][j]   = new CellData();
 			}
 		}
 		
@@ -433,13 +433,13 @@ function moveRight(){
 	preScore = score;
 	board = board.map(function(h){
 		return h.map(function(l) {
-			l.latX1 = -1;
-			l.lastY1 = -1;
+			l.latX1      = -1;
+			l.lastY1     = -1;
 			l.lastValue1 = 0;
-
-			l.lastX = l.nextX;
-			l.lastY = l.nextY;
-			l.lastValue = l.value;
+			
+			l.lastX      = l.nextX;
+			l.lastY      = l.nextY;
+			l.lastValue  = l.value;
 			return l;
 		});
 	});
@@ -447,16 +447,16 @@ function moveRight(){
 		var temp = board[i].filter(cutZero);
 		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
 			if(temp[j].value===temp[j-1].value){
-				temp[j].lastValue = temp[j].value;
-				temp[j].value*=2;
-				temp[j].nextX = 4+j-len;
-
-				score+=temp[j].value;
-
+				temp[j].lastValue  = temp[j].value;
+				temp[j].value      *=2;
+				temp[j].nextX      = 4+j-len;
+				
+				score              +=temp[j].value;
+				
 				temp[j].lastValue1 = temp[j-1].value;
-				temp[j].lastX1 = temp[j-1].nextX;
-				temp[j].lastY1 = temp[j-1].nextY;
-
+				temp[j].lastX1     = temp[j-1].nextX;
+				temp[j].lastY1     = temp[j-1].nextY;
+				
 				temp.splice(j-1,1);
 				j--;
 			}
