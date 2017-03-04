@@ -22,18 +22,21 @@ function CellData(){
 	this.nextX      = -1;
 	this.value      = 0;
 } 
-
-//store board's data
-var board=[];
+function GameData() {
+	this.board = [];
+	this.score = 0; 
+	this.preScore = 0;
+	this.canUndo = true;
+}
+var data = new GameData();
 for(var i=0;i<4;i++)
 {
-	board[i] =[];
+	data.board[i] =[];
 	for(var j=0;j<4;j++)
 	{
-		board[i][j] = new CellData();
+		data.board[i][j] = new CellData();
 	}
 }
-
 
 //绘制方格
 initCss();
@@ -195,11 +198,11 @@ function getBest(){
 //update current score after every step
 function updateScore()
 {
-	document.querySelector("#myScore").textContent = score;
-	localStorage.score = score;
-	if( score > Number(localStorage.best)){
-		document.querySelector("#maxScore").textContent = score;
-		localStorage.best = score;
+	document.querySelector("#myScore").textContent = data.score;
+	localStorage.score = data.score;
+	if( data.score > Number(localStorage.best)){
+		document.querySelector("#maxScore").textContent = data.score;
+		localStorage.best = data.score;
 	}
 }
 
@@ -208,7 +211,7 @@ function updateScore()
 //start a new game
 function newGame()
 {
-	score=0;
+	data.score=0;
 	updateScore();
 	getBest();
 	clearBoard();
@@ -234,7 +237,7 @@ function clearBoard()
 	{
 		for(var j=0;j<4;j++)
 		{
-			board[i][j]=new CellData();
+			data.board[i][j]=new CellData();
 		}
 	}
 	updateBoardView();
@@ -248,11 +251,11 @@ function getRandomNumber()
 		var h=Math.floor(Math.random()*4);
 		var l=Math.floor(Math.random()*4);
 
-		if(board[h][l].value===0)
+		if(data.board[h][l].value===0)
 		{
-			board[h][l].value = (Math.random()>0.5?2:4);
-			board[h][l].lastX = board[h][l].nextX = l;
-			board[h][l].lastY = board[h][l].nextY = h;
+			data.board[h][l].value = (Math.random()>0.5?2:4);
+			data.board[h][l].lastX = data.board[h][l].nextX = l;
+			data.board[h][l].lastY = data.board[h][l].nextY = h;
 			
 			showRandomCell(h, l);
 
@@ -276,13 +279,13 @@ function showRandomCell(h, l){
 	con.style.height          = cellWidth + 'px';
 	con.style.transform       = "scale(0,0)";
 	con.style.lineHeight      = cellWidth+"px";
-	con.style.backgroundColor = numberBgColor(board[h][l].value);
-	if(board[h][l].value>100 && board[h][l].value<1000){
+	con.style.backgroundColor = numberBgColor(data.board[h][l].value);
+	if(data.board[h][l].value>100 && data.board[h][l].value<1000){
 		con.style.fontSize = cellWidth>100?"60px":"40px";
-	}else if(board[h][l].value>1000){
+	}else if(data.board[h][l].value>1000){
 		con.style.fontSize = cellWidth>100?"40px":"30px";
 	}
-	con.textContent = board[h][l].value;
+	con.textContent = data.board[h][l].value;
 	view.appendChild(con);
 	setTimeout(function(){
 		con.style.transform = "scale(1,1)";
@@ -306,7 +309,7 @@ function updateBoardView()
 	{
 		for(var j=0;j<4;j++)
 		{
-			if(board[i][j].value)
+			if(data.board[i][j].value)
 			{
 				var con = document.createElement("div");
 				con.setAttribute("class", "cell con");
@@ -316,13 +319,13 @@ function updateBoardView()
 				con.style.width           = cellWidth+"px";
 				con.style.height          = cellWidth+"px";
 				con.style.lineHeight      = cellWidth+"px";
-				con.style.backgroundColor = numberBgColor(board[i][j].value);
-				if(board[i][j].value>100 && board[i][j].value<1000){
+				con.style.backgroundColor = numberBgColor(data.board[i][j].value);
+				if(data.board[i][j].value>100 && data.board[i][j].value<1000){
 					con.style.fontSize = cellWidth>100?"60px":"40px";
-				}else if(board[i][j].value>1000){
+				}else if(data.board[i][j].value>1000){
 					con.style.fontSize = cellWidth>100?"40px":"30px";
 				}
-				con.textContent = board[i][j].value;
+				con.textContent = data.board[i][j].value;
 				cons.appendChild(con);
 			}
 		}
@@ -351,26 +354,26 @@ function numberBgColor(num)
 		default:return "#C54A19";
 	}
 }
-function canMove(direction) {
+function canMove( direction ) {
 	for(var i=0;i<4;i++)
 	{
 		for(var j=1;j<4;j++)
 		{
 			if( direction === 'left'){
-				if ( board[i][j].value !==0 && (board[i][j-1].value ===0 || board[i][j].value === board[i][j-1].value) )
+				if ( data.board[i][j].value !==0 && (data.board[i][j-1].value ===0 || data.board[i][j].value === data.board[i][j-1].value) )
 				{
 					return true;
 				}
 			}else if ( direction === 'right') {
-				if(board[i][3-j].value !==0 && (board[i][4-j].value ===0 || board[i][3-j].value === board[i][4-j].value)){
+				if(data.board[i][3-j].value !==0 && (data.board[i][4-j].value ===0 || data.board[i][3-j].value === data.board[i][4-j].value)){
 					return true;
 				}
 			}else if( direction === 'up'){
-				if(board[j][i].value !==0 && (board[j-1][i].value ===0 || board[j][i].value === board[j-1][i].value)){
+				if(data.board[j][i].value !==0 && (data.board[j-1][i].value ===0 || data.board[j][i].value === data.board[j-1][i].value)){
 					return true;
 				}
 			}else if( direction === 'down'){
-				if(board[3-j][i].value !==0 && (board[4-j][i].value ===0 || board[3-j][i].value === board[4-j][i].value)){
+				if(data.board[3-j][i].value !==0 && (data.board[4-j][i].value ===0 || data.board[3-j][i].value === data.board[4-j][i].value)){
 					return true;
 				}
 			}else{
@@ -384,11 +387,9 @@ function canMove(direction) {
 function cutZero(v){
 	return v.value>0;
 }
-
-
-function moveLeft(){
-	preScore = score;
-	board = board.map(function(h){
+// work before moving (update lastX, lastY, lastValue and so on)
+function updatedBoard() {
+	return data.board.map(function(h){
 		return h.map(function(l) {
 			l.latX1      = -1;
 			l.lastY1     = -1;
@@ -400,194 +401,137 @@ function moveLeft(){
 			return l;
 		});
 	});
-	for( var i=0; i<4; i++){
+}
+//exchange board
 
-		var temp = board[i].filter(cutZero);
-		for (var j = 0; j < temp.length-1; j++) {
-			if(temp[j].value===temp[j+1].value){
-				temp[j].lastValue  = temp[j].value;
-				temp[j].value     *= 2;
-				temp[j].nextX      = j;
-				
-				score             += temp[j].value;
-				
-				temp[j].lastValue1 = temp[j+1].value;
-				temp[j].lastX1     = temp[j+1].nextX;
-				temp[j].lastY1     = temp[j+1].nextY;
-				temp.splice(j+1,1);
-			}
-		}
-		for(j=0; j<4; j++){
-			if( j<temp.length){
-				board[i][j]   = temp[j];
-				temp[j].nextX = j;
-			}else{
-				board[i][j]   = new CellData();
-			}
-		}
-		
-	}
+function moveLeft(){
+	preScore = score;
+	data.board = updatedBoard();
+	moveType( 'left', data.board );
 	slideAnimate();
 }
 function moveRight(){
 	preScore = score;
-	board = board.map(function(h){
-		return h.map(function(l) {
-			l.latX1      = -1;
-			l.lastY1     = -1;
-			l.lastValue1 = 0;
+	data.board = updatedBoard();
+	moveType('right', data.board);
+	slideAnimate();
+}
+
+function moveType( type, boardData ) {
+	var temp = [];
+	var i,j,k;
+	if( type === 'left' || type === 'up') {
+		for( i=0; i<4; i++){
+
+			temp = boardData[i].filter(function(item){return item.value>0;});
+			for ( j = 0; j < temp.length-1; j++ ) {
+				if ( temp[j].value === temp[j+1].value ) {
+					temp[j].lastValue  = temp[j].value;
+					temp[j].value     *= 2;
+					
+					score             += temp[j].value;
+					
+					temp[j].lastValue1 = temp[j+1].value;
+					temp[j].lastX1     = temp[j+1].nextX;
+					temp[j].lastY1     = temp[j+1].nextY;
+					temp.splice(j+1,1);
+				}
+			}
+			for(j=0; j<4; j++){
+				if( j<temp.length){
+					boardData[i][j]   = temp[j];
+					if ( type === 'left' ){
+						temp[j].nextX = j;
+					}else {
+						temp[j].nextY = j;
+					}
+					
+				}else{
+					boardData[i][j]   = new CellData();
+				}
+			}
 			
-			l.lastX      = l.nextX;
-			l.lastY      = l.nextY;
-			l.lastValue  = l.value;
-			return l;
+			
+		}
+	}
+	if( type === 'down' || type === 'right') {
+		for( i=0; i<4; i++){
+			temp = boardData[i].filter(function(item){return item.value>0;});
+			for ( j = temp.length-1; j > 0; j-- ) {
+				if(temp[j].value===temp[j-1].value){
+					temp[j].lastValue  = temp[j].value;
+					temp[j].value     *= 2;
+					
+					score              +=temp[j].value;
+					
+					temp[j].lastValue1 = temp[j-1].value;
+					temp[j].lastX1     = temp[j-1].nextX;
+					temp[j].lastY1     = temp[j-1].nextY;
+					
+					temp.splice(j-1,1);
+					j--;
+				}
+			}
+			boardData[i].splice(0,4);
+			boardData[i] = boardData[i].concat(temp);
+			k=0;
+			while(boardData[i].length<4){
+				boardData[i].unshift(new CellData());
+				k++;
+			}
+			for(; k<4; k++){
+				if( type === 'right' )
+					boardData[i][k].nextX = k;
+				else
+					boardData[i][k].nextY = k;
+			}
+				
+			}
+	}
+
+	data.board.map(function(v1, h){
+		return v1.map(function(v2, l){
+			return boardData[h][l];
 		});
 	});
-	for( var i=0; i<4; i++){
-		var temp = board[i].filter(cutZero);
-		for (var j = temp.length-1,len=temp.length; j > 0; j--) {
-			if(temp[j].value===temp[j-1].value){
-				temp[j].lastValue  = temp[j].value;
-				temp[j].value      *=2;
-				temp[j].nextX      = 4+j-len;
-				
-				score              +=temp[j].value;
-				
-				temp[j].lastValue1 = temp[j-1].value;
-				temp[j].lastX1     = temp[j-1].nextX;
-				temp[j].lastY1     = temp[j-1].nextY;
-				
-				temp.splice(j-1,1);
-				j--;
-			}
-		}
-		board[i].splice(0,4);
-		board[i] = board[i].concat(temp);
-		var k=0;
-		while(board[i].length<4){
-			board[i].unshift(new CellData());
-			k++;
-		}
-		for(; k<4; k++){
-			board[i][k].nextX = k;
-		}
-		
-	}
-	slideAnimate();
 }
 function moveUp(){
 	preScore = score;
-	board = board.map(function(h){
-		return h.map(function(l) {
-			l.latX1 = -1;
-			l.lastY1 = -1;
-			l.lastValue1 = 0;
-
-			l.lastX = l.nextX;
-			l.lastY = l.nextY;
-			l.lastValue = l.value;
-			return l;
-		});
-	});
+	data.board = updatedBoard();
 	var boardTemp = [];
 	var i = 0,
 		j = 0;
 	for(i=0; i<4; i++){
 		boardTemp[i] = [];
 		for(j=0; j<4; j++){
-			boardTemp[i][j] = board[j][i];
+			boardTemp[i][j] = data.board[j][i];
 		}
 	}
-	for(i=0; i<4; i++){
-		var temp = boardTemp[i].filter(cutZero);
-		for (j = 0; j < temp.length-1; j++) {
-			if(temp[j].value===temp[j+1].value){
-				temp[j].lastValue = temp[j].value;
-				temp[j].value*=2;
-				temp[j].nextY = j;
-
-				score+=temp[j].value;
-
-				temp[j].lastValue1 = temp[j+1].value;
-				temp[j].lastY1 = temp[j+1].nextY;
-				temp[j].lastX1 = temp[j+1].nextX;
-
-				temp.splice(j+1,1);
-			}
-		}
-		for(j=0; j<4; j++){
-			if(j<temp.length){
-				boardTemp[i][j] = temp[j];
-				boardTemp[i][j].nextY = j;
-			}else{
-				boardTemp[i][j] = new CellData();
-			}
-		}
-		
-	}
+	moveType('up', boardTemp);
+	
 	for(i=0; i<4; i++){
 		for(j=0; j<4; j++){
-			board[i][j] = boardTemp[j][i];
+			data.board[i][j] = boardTemp[j][i];
 		}
 	}
 	slideAnimate();
 }
 function moveDown(){
 	preScore = score;
-	board = board.map(function(h){
-		return h.map(function(l) {
-			l.latX1 = -1;
-			l.lastY1 = -1;
-			l.lastValue1 = 0;
-
-			l.lastX = l.nextX;
-			l.lastY = l.nextY;
-			l.lastValue = l.value;
-			return l;
-		});
-	});
+	data.board = updatedBoard();
 	var boardTemp = [];
 	var i = 0,
-		j = 0,
-		len = 0;
+		j = 0;
 	for(i=0; i<4; i++){
 		boardTemp[i] = [];
 		for(j=0; j<4; j++){
-			boardTemp[i][j] = board[j][i];
+			boardTemp[i][j] = data.board[j][i];
 		}
 	}
-	for(i=0; i<4; i++){
-		var temp = boardTemp[i].filter(cutZero);
-		for (j = temp.length-1,len=temp.length; j > 0; j--) {
-			if(temp[j].value===temp[j-1].value){
-				temp[j].lastValue = temp[j].value;
-				temp[j].value*=2;
-				temp[j].nextY = 4+j-len;
-
-				score+=temp[j].value;
-
-				temp[j].lastValue1 = temp[j-1].value;
-				temp[j].lastY1 = temp[j-1].nextY;
-				temp[j].lastX1 = temp[j-1].nextX;
-
-				temp.splice(j-1,1);
-				j--;
-			}
-		}
-		boardTemp[i].splice(0,4);
-		boardTemp[i] = boardTemp[i].concat(temp);
-		var k=0;
-		while(boardTemp[i].length<4){
-			boardTemp[i].unshift(new CellData());
-			k++;
-		}
-		for(;k<4;k++){
-			boardTemp[i][k].nextY = k;
-		}
-	}
+	moveType('down', boardTemp);
 	for(i=0; i<4; i++){
 		for(j=0; j<4; j++){
-			board[i][j] = boardTemp[j][i];
+			data.board[i][j] = boardTemp[j][i];
 		}
 	}
 	slideAnimate();
@@ -602,14 +546,14 @@ function slideAnimate(){
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
 
-			if( board[i][j].value){
-				var con = document.querySelector("#con-"+board[i][j].lastY+"-"+board[i][j].lastX);
-				con.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
-				con.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
-				if( board[i][j].lastValue1){
-					var con1 = document.querySelector("#con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
-					con1.style.left=(cellWidth+cellSpace)*board[i][j].nextX+cellSpace+"px";
-					con1.style.top =(cellWidth+cellSpace)*board[i][j].nextY+cellSpace+"px";
+			if( data.board[i][j].value){
+				var con = document.querySelector("#con-"+data.board[i][j].lastY+"-"+data.board[i][j].lastX);
+				con.style.left=(cellWidth+cellSpace)*data.board[i][j].nextX+cellSpace+"px";
+				con.style.top =(cellWidth+cellSpace)*data.board[i][j].nextY+cellSpace+"px";
+				if( data.board[i][j].lastValue1){
+					var con1 = document.querySelector("#con-"+data.board[i][j].lastY1+"-"+data.board[i][j].lastX1);
+					con1.style.left=(cellWidth+cellSpace)*data.board[i][j].nextX+cellSpace+"px";
+					con1.style.top =(cellWidth+cellSpace)*data.board[i][j].nextY+cellSpace+"px";
 				}
 			}
 		}
@@ -618,7 +562,7 @@ function slideAnimate(){
 	setTimeout(function(){
 		updateBoardView();
 		getRandomNumber();
-		localStorage.board = JSON.stringify(board);
+		localStorage.board = JSON.stringify(data.board);
 		updateScore();
 		if(!canMove()){
 			setTimeout(function(){
@@ -627,7 +571,7 @@ function slideAnimate(){
 				localStorage.removeItem("board");
 				localStorage.score = 0;
 				if( score>localStorage.best ){
-					localStorage.best = score;
+					localStorage.best = data.score;
 				}
 			},300);
 		}
@@ -712,14 +656,14 @@ function undo(){
 
 function getLocalBoard() {
 	if( typeof(localStorage.board)!="undefined"){
-		board = JSON.parse(localStorage.board);
+		data.board = JSON.parse(localStorage.board);
 		updateBoardView();
 
 		randomCell = JSON.parse(localStorage.random);
-		canUndo = true;
+		data.canUndo = true;
 
-		score = Number(localStorage.score);
-		document.querySelector("#myScore").textContent = score;
+		data.score = Number(localStorage.score);
+		document.querySelector("#myScore").textContent = data.score;
 
 		return true;
 	}else{
