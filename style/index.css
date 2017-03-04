@@ -27,6 +27,11 @@
 	font-weight: bold;
 	color: #776e65;
 }
+#cons-block, #cells-block {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+}
 
 #best, #score{
 	position: absolute;
@@ -66,8 +71,6 @@ p#info {
 	left: 10px;
 	width: 520px;
 	height: 520px;
-
-	/*box-shadow: 0px 0px 10px #383838,4px 4px 10px #383838;*/
 
 	background-color: #bbada0;
 }

@@ -1,14 +1,7 @@
 "use strict";
-//store current score and previous score
-var score      = 0;
-var	preScore   = 0;
-//can undo or not
-var canUndo    = true;
 //every cell's width and space's width
 var cellWidth  = 110;
 var	cellSpace  = 16;
-var randomCell = {x:-1, y:-1};
-var view       = document.querySelector("#view");
 
 //store every cell's location and value(include current', previous',next')
 function CellData(){
@@ -23,31 +16,35 @@ function CellData(){
 	this.value      = 0;
 } 
 function GameData() {
+}
+GameData.prototype.init = function() {
 	this.board = [];
-	this.score = 0; 
+	this.score = 0;
 	this.preScore = 0;
 	this.canUndo = true;
-}
-var data = new GameData();
-for(var i=0;i<4;i++)
-{
-	data.board[i] =[];
-	for(var j=0;j<4;j++)
-	{
-		data.board[i][j] = new CellData();
+	this.randomCell = {x:-1, y: -1};
+	for(var i=0; i<4; i++) {
+		this.board[i] = [];
+		for(var j=0; j<4; j++) {
+			this.board[i][j] = new CellData();
+		}
 	}
-}
+};
+
+var data = new GameData();
+data.init();
 
 //绘制方格
 initCss();
 if(!getLocalBoard()){
 	newGame();
 }
+
 getBest();
-addMyEventListener();
+addEvent();
 
 
-function addMyEventListener(){
+function addEvent(){
 	document.querySelector("#restart").addEventListener("click",newGame);
 	document.querySelector("#start").addEventListener("click", function(){
 		newGame();
@@ -62,7 +59,7 @@ function addMyEventListener(){
 			event.preventDefault();
 			if(canMove('left'))
 			{
-				moveLeft();
+				move('left');
 			}
 		}
 		if(event.which==38)
@@ -70,7 +67,7 @@ function addMyEventListener(){
 			event.preventDefault();
 			if(canMove('up'))
 			{
-				moveUp();
+				move('up');
 			}
 		}
 		if(event.which==39)
@@ -78,7 +75,7 @@ function addMyEventListener(){
 			event.preventDefault();
 			if(canMove('right'))
 			{
-				moveRight();
+				move('right');
 			}
 		}
 		if(event.which==40)
@@ -86,7 +83,7 @@ function addMyEventListener(){
 			event.preventDefault();
 			if(canMove('down'))
 			{
-				moveDown();
+				move('down');
 			}
 			
 		}
@@ -124,23 +121,23 @@ function addMyEventListener(){
 		{
 			if(dX>0 && canMove('right'))
 			{
-				moveRight();
+				move('right');
 				isTouchDown = 0;
 			}else if(dX<0 && canMove('left'))
 			{
-				moveLeft();
+				move('left');
 				isTouchDown = 0;
 			}
 		}else if(Math.abs(dX) <= Math.abs(dY))
 		{
 			if( canMove('down') && dY>0 )
 			{
-				moveDown();
+				move('down');
 				isTouchDown = 0;
 			}																
 			else if( canMove('up') && dY<0 )
 			{
-				moveUp();
+				move('up');
 				isTouchDown = 0;
 			}
 		}
@@ -149,10 +146,8 @@ function addMyEventListener(){
 }
 
 //init board css according screen width
-function initCss()
-{
-	var view        = document.querySelector("#view");
-	
+function initCss() {
+	var view       = document.querySelector("#view");
 	var clientWidth = document.body.clientWidth;
 	if(clientWidth<500)
 	{
@@ -169,6 +164,7 @@ function initCss()
 		cellSpace         = (clientWidth-20)*0.04;
 	}
 	
+	var cells_block = document.getElementById('cells-block');
 	var cells = document.createDocumentFragment();
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
@@ -182,7 +178,7 @@ function initCss()
 		}
 	}
 	
-	view.appendChild(cells);
+	cells_block.appendChild(cells);
 }
 
 //get best score from localStorage
@@ -196,8 +192,7 @@ function getBest(){
 }
 
 //update current score after every step
-function updateScore()
-{
+function updateScore() {
 	document.querySelector("#myScore").textContent = data.score;
 	localStorage.score = data.score;
 	if( data.score > Number(localStorage.best)){
@@ -209,43 +204,23 @@ function updateScore()
 
 
 //start a new game
-function newGame()
-{
-	data.score=0;
-	updateScore();
+function newGame() {
+	data.init();
+	document.querySelector("#myScore").textContent = data.score;
 	getBest();
-	clearBoard();
-	localStorage.removeItem("board");
 
 	getRandomNumber();
 	getRandomNumber();
 	localStorage.removeItem("random");
 
+	updateView();
+
 	document.querySelector("#undo").setAttribute("disabled", "true");
 	document.querySelector("#undo").style.backgroundColor = "#CECECE";
-
-	updateBoardView();
-
-}
-
-//clear board and data in order to start a game
-function clearBoard()
-{
-	removeCons();
-	
-	for(var i=0;i<4;i++)
-	{
-		for(var j=0;j<4;j++)
-		{
-			data.board[i][j]=new CellData();
-		}
-	}
-	updateBoardView();
 }
 
 //update a cell randomly
-function getRandomNumber()
-{
+function getRandomNumber() {
 	while(true)
 	{
 		var h=Math.floor(Math.random()*4);
@@ -259,9 +234,9 @@ function getRandomNumber()
 			
 			showRandomCell(h, l);
 
-			randomCell.x = l;
-			randomCell.y = h;
-			localStorage.random = JSON.stringify(randomCell);
+			data.randomCell.x = l;
+			data.randomCell.y = h;
+			localStorage.random = JSON.stringify(data.randomCell);
 
 			break;
 		}
@@ -286,24 +261,15 @@ function showRandomCell(h, l){
 		con.style.fontSize = cellWidth>100?"40px":"30px";
 	}
 	con.textContent = data.board[h][l].value;
-	view.appendChild(con);
+	document.getElementById('cons-block').appendChild(con);
 	setTimeout(function(){
 		con.style.transform = "scale(1,1)";
-	},100);
-}
-function removeCons(){
-	var cons = document.querySelectorAll(".con");
-	if(cons.length>0){
-		for( var i=0,len=cons.length; i<len; i++){
-			view.removeChild(cons[i]);
-		}
-	}
+	},200);
 }
 
-function updateBoardView()
-{
-	removeCons();
-		
+function updateView() {
+	var cons_block = document.getElementById('cons-block');
+	cons_block.innerHTML = '';
 	var cons = document.createDocumentFragment();
 	for(var i=0;i<4;i++)
 	{
@@ -330,12 +296,11 @@ function updateBoardView()
 			}
 		}
 	}
-	view.appendChild(cons);
+	cons_block.appendChild(cons);
 
 }
 
-function numberBgColor(num)
-{
+function numberBgColor(num){
 	switch (num)
 	{
 		case 2:return "#EFEFEF" ;
@@ -383,10 +348,6 @@ function canMove( direction ) {
 	}
 	return false;
 }
-
-function cutZero(v){
-	return v.value>0;
-}
 // work before moving (update lastX, lastY, lastValue and so on)
 function updatedBoard() {
 	return data.board.map(function(h){
@@ -402,18 +363,30 @@ function updatedBoard() {
 		});
 	});
 }
-//exchange board
 
-function moveLeft(){
-	preScore = score;
+function move(direction) {
+	data.preScore = data.score;
 	data.board = updatedBoard();
-	moveType( 'left', data.board );
-	slideAnimate();
-}
-function moveRight(){
-	preScore = score;
-	data.board = updatedBoard();
-	moveType('right', data.board);
+	if (direction === 'left' || direction === 'right') {
+		moveType( direction, data.board);
+	} else {
+		var boardTemp = [];
+		var i,j;
+		for( i=0; i<4; i++){
+			boardTemp[i] = [];
+			for( j=0; j<4; j++){
+				boardTemp[i][j] = data.board[j][i];
+			}
+		}
+	
+		moveType(direction, boardTemp);
+		
+		for(i=0; i<4; i++){
+			for(j=0; j<4; j++){
+				data.board[i][j] = boardTemp[j][i];
+			}
+		}
+	}
 	slideAnimate();
 }
 
@@ -429,7 +402,7 @@ function moveType( type, boardData ) {
 					temp[j].lastValue  = temp[j].value;
 					temp[j].value     *= 2;
 					
-					score             += temp[j].value;
+					data.score             += temp[j].value;
 					
 					temp[j].lastValue1 = temp[j+1].value;
 					temp[j].lastX1     = temp[j+1].nextX;
@@ -462,7 +435,7 @@ function moveType( type, boardData ) {
 					temp[j].lastValue  = temp[j].value;
 					temp[j].value     *= 2;
 					
-					score              +=temp[j].value;
+					data.score        += temp[j].value;
 					
 					temp[j].lastValue1 = temp[j-1].value;
 					temp[j].lastX1     = temp[j-1].nextX;
@@ -486,7 +459,7 @@ function moveType( type, boardData ) {
 					boardData[i][k].nextY = k;
 			}
 				
-			}
+		}
 	}
 
 	data.board.map(function(v1, h){
@@ -495,82 +468,42 @@ function moveType( type, boardData ) {
 		});
 	});
 }
-function moveUp(){
-	preScore = score;
-	data.board = updatedBoard();
-	var boardTemp = [];
-	var i = 0,
-		j = 0;
-	for(i=0; i<4; i++){
-		boardTemp[i] = [];
-		for(j=0; j<4; j++){
-			boardTemp[i][j] = data.board[j][i];
-		}
-	}
-	moveType('up', boardTemp);
-	
-	for(i=0; i<4; i++){
-		for(j=0; j<4; j++){
-			data.board[i][j] = boardTemp[j][i];
-		}
-	}
-	slideAnimate();
-}
-function moveDown(){
-	preScore = score;
-	data.board = updatedBoard();
-	var boardTemp = [];
-	var i = 0,
-		j = 0;
-	for(i=0; i<4; i++){
-		boardTemp[i] = [];
-		for(j=0; j<4; j++){
-			boardTemp[i][j] = data.board[j][i];
-		}
-	}
-	moveType('down', boardTemp);
-	for(i=0; i<4; i++){
-		for(j=0; j<4; j++){
-			data.board[i][j] = boardTemp[j][i];
-		}
-	}
-	slideAnimate();
-}
 
 function slideAnimate(){
 	//上一步可用
-	canUndo = true;
+	data.canUndo = true;
 	document.querySelector("#undo").removeAttribute("disabled");
 	document.querySelector("#undo").style.backgroundColor = "#8f7a66";
 
+	var item;
 	for(var i=0; i<4; i++){
 		for(var j=0; j<4; j++){
-
-			if( data.board[i][j].value){
-				var con = document.querySelector("#con-"+data.board[i][j].lastY+"-"+data.board[i][j].lastX);
-				con.style.left=(cellWidth+cellSpace)*data.board[i][j].nextX+cellSpace+"px";
-				con.style.top =(cellWidth+cellSpace)*data.board[i][j].nextY+cellSpace+"px";
-				if( data.board[i][j].lastValue1){
-					var con1 = document.querySelector("#con-"+data.board[i][j].lastY1+"-"+data.board[i][j].lastX1);
-					con1.style.left=(cellWidth+cellSpace)*data.board[i][j].nextX+cellSpace+"px";
-					con1.style.top =(cellWidth+cellSpace)*data.board[i][j].nextY+cellSpace+"px";
+			item = data.board[i][j];
+			if( item.value ) {
+				var con        = document.querySelector("#con-"+item.lastY+"-"+item.lastX);
+				con.style.left = (cellWidth+cellSpace)*item.nextX+cellSpace+"px";
+				con.style.top  = (cellWidth+cellSpace)*item.nextY+cellSpace+"px";
+				if( item.lastValue1){
+					var con1        = document.querySelector("#con-"+item.lastY1+"-"+item.lastX1);
+					con1.style.left = (cellWidth+cellSpace)*item.nextX+cellSpace+"px";
+					con1.style.top  = (cellWidth+cellSpace)*item.nextY+cellSpace+"px";
 				}
 			}
 		}
 	}
 	
 	setTimeout(function(){
-		updateBoardView();
+		updateView();
 		getRandomNumber();
 		localStorage.board = JSON.stringify(data.board);
 		updateScore();
 		if(!canMove()){
 			setTimeout(function(){
 				document.querySelector("#over").style.display = "block";
-				document.querySelector("#finalScore").textContent = score;
+				document.querySelector("#finalScore").textContent = data.score;
 				localStorage.removeItem("board");
 				localStorage.score = 0;
-				if( score>localStorage.best ){
+				if( data.score>Number(localStorage.best) ){
 					localStorage.best = data.score;
 				}
 			},300);
@@ -578,88 +511,94 @@ function slideAnimate(){
 	}, 150);
 }
 function undo(){
-	if( !canUndo){
+	if( !data.canUndo){
 		return;
 	}
 	//上一步不可用
-	canUndo = false;
+	data.canUndo = false;
 	document.querySelector("#undo").setAttribute("disabled", "true");
 	document.querySelector("#undo").style.backgroundColor = "#CECECE";
-	board[randomCell.y][randomCell.x].value = 0;
-	board[randomCell.y][randomCell.x].lastX = board[randomCell.y][randomCell.x].nextX = -1;
-	board[randomCell.y][randomCell.x].lastY = board[randomCell.y][randomCell.x].nextY = -1;
+	var x = data.randomCell.x, y = data.randomCell.y;
+	var item = data.board[y][x];
+	item.value = 0;
+	item.lastX = item.nextX = -1;
+	item.lastY = item.nextY = -1;
 	
-	document.querySelector("#con-"+randomCell.y+"-"+randomCell.x).style.transform = "scale(0,0)";
+	document.querySelector("#con-"+y+"-"+x).style.transform = "scale(0,0)";
 
 	setTimeout(function(){
-		view.removeChild(document.querySelector("#con-"+randomCell.y+"-"+randomCell.x));}, 150);
+		document.getElementById('cons-block').removeChild(document.querySelector("#con-"+y+"-"+x));}, 150);
 
 	var	cons = document.createDocumentFragment();
 	for (var i = 0; i < 4; i++) {
 		for (var j = 0; j < 4; j++) {
-			if( board[i][j].value){
-				board[i][j].nextX = board[i][j].lastX;
-				board[i][j].nextY = board[i][j].lastY;
-				board[i][j].value = board[i][j].lastValue;
-				board[i][j].lastX = -1;
-				board[i][j].lastY = -1;
-				board[i][j].lastValue = 0;
+			if( data.board[i][j].value){
+				item = data.board[i][j];
+				item.nextX = item.lastX;
+				item.nextY = item.lastY;
+				item.value = item.lastValue;
+				item.lastX = -1;
+				item.lastY = -1;
+				item.lastValue = 0;
 				var con = document.querySelector("#con-"+i+"-"+j);
-				con.textContent = board[i][j].value;
-				con.style.backgroundColor = numberBgColor(board[i][j].value);
-				con.setAttribute("id", "con-"+board[i][j].nextY+"-"+board[i][j].nextX);
+				con.textContent = item.value;
+				con.style.backgroundColor = numberBgColor(item.value);
+				con.setAttribute("id", "con-"+item.nextY+"-"+item.nextX);
 
-				if(board[i][j].lastValue1) {
+				if(item.lastValue1) {
 					var con1 = document.createElement("div");
 					con1.setAttribute("class", "cell con");
-					con1.setAttribute("id", "con-"+board[i][j].lastY1+"-"+board[i][j].lastX1);
+					con1.setAttribute("id", "con-"+item.lastY1+"-"+item.lastX1);
 					con1.style.top = (cellWidth+cellSpace)*i+cellSpace+"px";
 					con1.style.left = (cellSpace+cellWidth)*j+cellSpace+"px";
 					con1.style.width = cellWidth+"px";
 					con1.style.height = cellWidth+"px";
 					con1.style.lineHeight = cellWidth+"px";
-					con1.style.backgroundColor = numberBgColor(board[i][j].lastValue1);
-					con1.textContent = board[i][j].lastValue1;
+					con1.style.backgroundColor = numberBgColor(item.lastValue1);
+					con1.textContent = item.lastValue1;
 					cons.appendChild(con1);
 				}
 			}
 		}
 	}
-	view.appendChild(cons);
+	document.getElementById('cons-block').appendChild(cons);
 
-	score = preScore;
+	data.score = data.preScore;
 
 	setTimeout(function(){
+		var item;
 		for(var i=0; i<4; i++){
 			for(var j=0; j<4; j++){
+				item = data.board[i][j];
+
 				if( document.querySelector("#con-"+i+"-"+j)){
 					document.querySelector("#con-"+i+"-"+j).style.top=(cellSpace+cellWidth)*i+cellSpace+"px";
 					document.querySelector("#con-"+i+"-"+j).style.left=(cellSpace+cellWidth)*j+cellSpace+"px";
-
-					board[i][j].value = Number(document.querySelector("#con-"+i+"-"+j).textContent);
-					board[i][j].lastX = board[i][j].nextX = j;
-					board[i][j].lastY = board[i][j].nextY = i;
-					board[i][j].lastX1 = -1;
-					board[i][j].lastY1 = -1;
-					board[i][j].lastValue = 0;
+					
+					item.value = Number(document.querySelector("#con-"+i+"-"+j).textContent);
+					item.lastX = item.nextX = j;
+					item.lastY = item.nextY = i;
+					item.lastX1 = -1;
+					item.lastY1 = -1;
+					item.lastValue = 0;
 				}else{
-					board[i][j].value = 0;
-					board[i][j].nextX = -1;
-					board[i][j].nextY = -1;
+					item.value = 0;
+					item.nextX = -1;
+					item.nextY = -1;
 				}
 			}
 		}
 		updateScore();
-	}, 200);
+	}, 150);
 	
 }
 
 function getLocalBoard() {
 	if( typeof(localStorage.board)!="undefined"){
 		data.board = JSON.parse(localStorage.board);
-		updateBoardView();
+		updateView();
 
-		randomCell = JSON.parse(localStorage.random);
+		data.randomCell = JSON.parse(localStorage.random);
 		data.canUndo = true;
 
 		data.score = Number(localStorage.score);
