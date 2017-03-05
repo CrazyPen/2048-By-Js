@@ -2,24 +2,32 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
 	<title>2048</title>
 	<link rel="stylesheet" type="text/css" href="style/index.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 </head>
 <body>
 	<div id="game">
-		<h1 id="model">2048</h1>
-		<p id="info">上、下、左、右键或触摸屏滑动</p>
-		<div id="best">
-			<span>最高分</span><br>
-			<span id="maxScore">0</span>
+		<div id="top">
+			<div class="left">
+				<h1 id="model"><b>2048</b></h1>
+				<p id="info">上、下、左、右键或触摸屏滑动</p>
+			</div>
+			<div class="right">
+				<div class="show-block">
+					<h6>最高分</h6>
+					<p id="maxScore">0</p>
+				</div>
+				<div class="show-block">
+					<h6>得分</h6>
+					<p id="myScore">0</p>
+				</div>
+			
+				<button id="undo">上一步</button>
+				<button id="restart">重新开始</button>
+			</div>
 		</div>
-		<div id="score">
-			<span>得分</span><br>
-			<span id="myScore">0</span>
-		</div>
-		<button id="undo">上一步</button>
-		<button id="restart">重新开始</button>
+		
 		<div id="view">
 			<div id="cells-block">
 				
@@ -27,13 +35,13 @@
 			<div id="cons-block">
 				
 			</div>
+			<div id="over">
+				<p id="scoreTitle">得分</p>
+				<p id="finalScore">2048</p>
+				<button id="start">再来一局</button>
+			</div>
 		</div>
-		<div id="over">
-			<p id="title">游戏结束</p>
-			<p id="scoreTitle">得分</p>
-			<p id="finalScore">2048</p>
-			<button id="start">再来一局</button>
-		</div>
+		
 	</div>
 	
 	<script src="js/index.js"></script>

@@ -1,4 +1,5 @@
-"use strict";
+(function(){
+ "use strict";
 //every cell's width and space's width
 var cellWidth  = 110;
 var	cellSpace  = 16;
@@ -609,3 +610,5 @@ function getLocalBoard() {
 		return false;
 	}
 }
+
+})();
