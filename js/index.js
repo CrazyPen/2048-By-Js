@@ -95,7 +95,7 @@ function addEvent(){
 	var startX      = 0,
 		startY      = 0;
 	
-	var view = document.querySelector("#view");
+	var view = document.querySelector("cons_block");
 	view.addEventListener("touchstart",function(e){
 		e.preventDefault();
 		
