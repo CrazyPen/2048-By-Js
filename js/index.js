@@ -95,7 +95,7 @@ function addEvent(){
 	var startX      = 0,
 		startY      = 0;
 	
-	var view = document.querySelector("cons_block");
+	var view = document.querySelector("#cons-block");
 	view.addEventListener("touchstart",function(e){
 		e.preventDefault();
 		
@@ -256,12 +256,11 @@ function showRandomCell(h, l){
 	con.style.transform       = "scale(0,0)";
 	con.style.lineHeight      = cellWidth+"px";
 	con.style.backgroundColor = numberBgColor(data.board[h][l].value);
-	if(data.board[h][l].value>100 && data.board[h][l].value<1000){
-		con.style.fontSize = cellWidth>100?"60px":"40px";
-	}else if(data.board[h][l].value>1000){
-		con.style.fontSize = cellWidth>100?"40px":"30px";
-	}
+	
 	con.textContent = data.board[h][l].value;
+	if(data.board[i][j].value>1000){
+					con.style.fontSize = cellWidth>100?"40px":"30px";
+				}
 	document.getElementById('cons-block').appendChild(con);
 	setTimeout(function(){
 		con.style.transform = "scale(1,1)";
@@ -287,9 +286,7 @@ function updateView() {
 				con.style.height          = cellWidth+"px";
 				con.style.lineHeight      = cellWidth+"px";
 				con.style.backgroundColor = numberBgColor(data.board[i][j].value);
-				if(data.board[i][j].value>100 && data.board[i][j].value<1000){
-					con.style.fontSize = cellWidth>100?"60px":"40px";
-				}else if(data.board[i][j].value>1000){
+				if(data.board[i][j].value>1000){
 					con.style.fontSize = cellWidth>100?"40px":"30px";
 				}
 				con.textContent = data.board[i][j].value;
