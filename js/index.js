@@ -258,9 +258,9 @@ function showRandomCell(h, l){
 	con.style.backgroundColor = numberBgColor(data.board[h][l].value);
 	
 	con.textContent = data.board[h][l].value;
-	if(data.board[i][j].value>1000){
-					con.style.fontSize = cellWidth>100?"40px":"30px";
-				}
+	if(data.board[h][l].value>1000){
+		con.style.fontSize = cellWidth>100?"40px":"30px";
+	}
 	document.getElementById('cons-block').appendChild(con);
 	setTimeout(function(){
 		con.style.transform = "scale(1,1)";
