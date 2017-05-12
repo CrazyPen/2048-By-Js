@@ -1,37 +1,48 @@
 /* global self, caches, fetch */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(function (registration) {
-    console.log('ServiceWorker registration successful with scope', registration.scope)
-  }).catch(function (err) {
-    console.log('ServiceWorker registration failed:', err)
-  })
-  var cacheFiles = [
-    './',
-    './manifest.json',
-    './index.html',
-    './js/index.js',
-    './style/index.css'
-  ]
-  var cacheName = '2048-by-js'
-  self.addEventListener('install', function (event) {
-    event.waitUntil(
-      caches.open(cacheName)
-        .then(function (cache) {
-          console.log('open cache')
-          return cache.addAll(cacheFiles)
-        })
-    )
-  })
 
-  self.addEventListener('fetch', function (event) {
-    event.responseWith(
-      caches.match(event.request)
-        .then(function (response) {
-          if (response) {
-            return response
-          }
-          return fetch(event.request)
-        })
-    )
-  })
-}
+var cacheFiles = [
+  './',
+  './index.html',
+  './js/index.js',
+  './style/index.css',
+  './assets/icon144.png'
+]
+var cacheName = '2048-by-js' + 'V0.6'
+self.addEventListener('install', function (event) {
+  // console.log('ServiceWorker is installing')
+  event.waitUntil(
+    caches.open(cacheName)
+      .then(function (cache) {
+        // console.log('open cache')
+        return cache.addAll(cacheFiles)
+                    .then(function () {
+                      self.skipWaiting()
+                    })
+      })
+  )
+})
+
+self.addEventListener('activate', function (e) {
+  // console.log('ServiceWorker Activate')
+  e.waitUntil(
+    caches.keys().then(function (keyList) {
+      return Promise.all(keyList.map(function (key) {
+        if (key !== cacheName) {
+          // console.log('ServiceWorker Removing old cache', key)
+          return caches.delete(key)
+        }
+      }))
+    })
+  )
+  return self.clients.claim()
+})
+
+self.addEventListener('fetch', function (event) {
+  // console.log('ServiceWorker fetching')
+  event.respondWith(
+    caches.match(event.request)
+      .then(function (response) {
+        return response || fetch(event.request)
+      })
+  )
+})
