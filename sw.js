@@ -1,5 +1,3 @@
-/* global self, caches, fetch */
-
 var cacheFiles = [
   './',
   './index.html',
