@@ -1,7 +1,7 @@
 {
   "name": "小游戏",
   "short_name": "小游戏",
-  "start_url": "/",
+  "start_url": "./",
   "description": "小游戏",
   "display": "standalone",
   "theme_color": "white",
