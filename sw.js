@@ -1,3 +1,4 @@
+/* global self, caches, fetch */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').then(function (registration) {
     console.log('ServiceWorker registration successful with scope', registration.scope)
@@ -6,14 +7,13 @@ if ('serviceWorker' in navigator) {
   })
   var cacheFiles = [
     '/',
+    '/manifest.json',
     '/index.html',
     '/js/index.js',
     '/style/index.css'
   ]
   var cacheName = '2048-by-js'
   self.addEventListener('install', function (event) {
-    console.log(arguments)
-    console.log(event)
     event.waitUntil(
       caches.open(cacheName)
         .then(function (cache) {
@@ -27,7 +27,7 @@ if ('serviceWorker' in navigator) {
     event.responseWith(
       caches.match(event.request)
         .then(function (response) {
-          if(response) {
+          if (response) {
             return response
           }
           return fetch(event.request)
