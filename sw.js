@@ -6,11 +6,11 @@ if ('serviceWorker' in navigator) {
     console.log('ServiceWorker registration failed:', err)
   })
   var cacheFiles = [
-    '/',
-    '/manifest.json',
-    '/index.html',
-    '/js/index.js',
-    '/style/index.css'
+    './',
+    './manifest.json',
+    './index.html',
+    './js/index.js',
+    './style/index.css'
   ]
   var cacheName = '2048-by-js'
   self.addEventListener('install', function (event) {
