@@ -3,6 +3,7 @@
   "short_name": "2048",
   "description": "2048小游戏",
   "display": "standalone",
+  "start_url": ".",
   "theme_color": "white",
   "background_color": "white",
   "icons":[
