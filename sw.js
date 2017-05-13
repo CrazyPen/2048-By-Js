@@ -5,7 +5,7 @@ var cacheFiles = [
   './style/index.css',
   './assets/icon144.png'
 ]
-var cacheName = '2048-by-js-' + 'V1.0'
+var cacheName = '2048-by-js-' + 'V1.5'
 self.addEventListener('install', function (event) {
   // console.log('ServiceWorker is installing')
   event.waitUntil(
