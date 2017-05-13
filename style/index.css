@@ -11,12 +11,14 @@
 html,body {
     background: #faf8ef;
     overflow: hidden;
+    display: flex;
+    height: 100%;
+    align-items: center;
 }
 #game {
     position: relative;
-
     width: 540px;
-    margin: 3rem auto;
+    margin: 0 auto;
     box-sizing: border-box;
     vertical-align: middle;
     background-color: #faf8ef;
@@ -38,7 +40,7 @@ h1 {
     font-size: 4rem;
 }
 p#info {
-    font-size: 0.7rem;
+    font-size: 1rem;
 }
 .right {
     float: right;
