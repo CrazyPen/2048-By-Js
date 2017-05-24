@@ -16,8 +16,11 @@ function CellData(){
 	this.nextX      = -1;
 	this.value      = 0;
 } 
+
+
 function GameData() {
 }
+
 GameData.prototype.init = function() {
 	this.board = [];
 	this.score = 0;
@@ -43,7 +46,6 @@ if(!getLocalBoard()){
 
 getBest();
 addEvent();
-
 
 function addEvent(){
 	document.querySelector("#restart").addEventListener("click",newGame);
@@ -220,14 +222,14 @@ function newGame() {
 	document.querySelector("#undo").style.backgroundColor = "#CECECE";
 }
 
-//update a cell randomly
+// update a cell randomly
 function getRandomNumber() {
 	while(true)
 	{
 		var h=Math.floor(Math.random()*4);
 		var l=Math.floor(Math.random()*4);
 
-		if(data.board[h][l].value===0)
+		if(!data.board[h][l].value)
 		{
 			data.board[h][l].value = (Math.random()>0.5?2:4);
 			data.board[h][l].lastX = data.board[h][l].nextX = l;
@@ -246,54 +248,27 @@ function getRandomNumber() {
 }
 
 function showRandomCell(h, l){
-	var con = document.createElement("div");
-	con.setAttribute("class", "cell con");
-	con.setAttribute("id", "con-"+h+"-"+l);
-	con.style.top             = cellSpace*(h+1)+cellWidth*h+"px";
-	con.style.left            = cellSpace*(l+1)+cellWidth*l+"px";
-	con.style.width           = cellWidth + 'px';
-	con.style.height          = cellWidth + 'px';
+	var con = createCell(h, l, data.board[h][l].value, h, l)
 	con.style.transform       = "scale(0,0)";
-	con.style.lineHeight      = cellWidth+"px";
-	con.style.backgroundColor = numberBgColor(data.board[h][l].value);
-	
-	con.textContent = data.board[h][l].value;
-	if(data.board[h][l].value>1000){
-		con.style.fontSize = cellWidth>100?"40px":"30px";
-	}
 	document.getElementById('cons-block').appendChild(con);
+
 	setTimeout(function(){
 		con.style.transform = "scale(1,1)";
-	},200);
+	},150);
 }
 
 function updateView() {
 	var cons_block = document.getElementById('cons-block');
 	cons_block.innerHTML = '';
 	var cons = document.createDocumentFragment();
-	for(var i=0;i<4;i++)
-	{
-		for(var j=0;j<4;j++)
-		{
-			if(data.board[i][j].value)
-			{
-				var con = document.createElement("div");
-				con.setAttribute("class", "cell con");
-				con.setAttribute("id", "con-"+i+"-"+j);
-				con.style.top             = cellSpace*(i+1)+cellWidth*i+"px";
-				con.style.left            = cellSpace*(j+1)+cellWidth*j+"px";
-				con.style.width           = cellWidth+"px";
-				con.style.height          = cellWidth+"px";
-				con.style.lineHeight      = cellWidth+"px";
-				con.style.backgroundColor = numberBgColor(data.board[i][j].value);
-				if(data.board[i][j].value>1000){
-					con.style.fontSize = cellWidth>100?"40px":"30px";
-				}
-				con.textContent = data.board[i][j].value;
+	data.board.forEach(function(items, i){
+		items.forEach(function(item, j){
+			if (item.value) {
+				var con = createCell(i, j, item.value, i, j)
 				cons.appendChild(con);
 			}
-		}
-	}
+		})
+	})
 	cons_block.appendChild(cons);
 
 }
@@ -365,9 +340,9 @@ function updatedBoard() {
 function move(direction) {
 	data.preScore = data.score;
 	data.board = updatedBoard();
-	if (direction === 'left' || direction === 'right') {
-		moveType( direction, data.board);
-	} else {
+	if (direction === 'left' || direction === 'right')
+		moveType(direction, data.board);
+	else {
 		var boardTemp = [];
 		var i,j;
 		for( i=0; i<4; i++){
@@ -400,7 +375,7 @@ function moveType( type, boardData ) {
 					temp[j].lastValue  = temp[j].value;
 					temp[j].value     *= 2;
 					
-					data.score             += temp[j].value;
+					data.score        += temp[j].value;
 					
 					temp[j].lastValue1 = temp[j+1].value;
 					temp[j].lastX1     = temp[j+1].nextX;
@@ -411,11 +386,10 @@ function moveType( type, boardData ) {
 			for(j=0; j<4; j++){
 				if( j<temp.length){
 					boardData[i][j]   = temp[j];
-					if ( type === 'left' ){
+					if ( type === 'left' )
 						temp[j].nextX = j;
-					}else {
+					else
 						temp[j].nextY = j;
-					}
 					
 				}else{
 					boardData[i][j]   = new CellData();
@@ -424,8 +398,7 @@ function moveType( type, boardData ) {
 			
 			
 		}
-	}
-	if( type === 'down' || type === 'right') {
+	}else if( type === 'down' || type === 'right') {
 		for( i=0; i<4; i++){
 			temp = boardData[i].filter(function(item){return item.value>0;});
 			for ( j = temp.length-1; j > 0; j-- ) {
@@ -443,8 +416,7 @@ function moveType( type, boardData ) {
 					j--;
 				}
 			}
-			boardData[i].splice(0,4);
-			boardData[i] = boardData[i].concat(temp);
+			boardData[i] = temp;
 			k=0;
 			while(boardData[i].length<4){
 				boardData[i].unshift(new CellData());
@@ -459,12 +431,12 @@ function moveType( type, boardData ) {
 				
 		}
 	}
-
-	data.board.map(function(v1, h){
-		return v1.map(function(v2, l){
-			return boardData[h][l];
+	if(type === 'left' || type === 'right')
+		data.board.map(function(v1, h){
+			return v1.map(function(v2, l){
+				return boardData[h][l];
+			});
 		});
-	});
 }
 
 function slideAnimate(){
@@ -473,22 +445,20 @@ function slideAnimate(){
 	document.querySelector("#undo").removeAttribute("disabled");
 	document.querySelector("#undo").style.backgroundColor = "#8f7a66";
 
-	var item;
-	for(var i=0; i<4; i++){
-		for(var j=0; j<4; j++){
-			item = data.board[i][j];
+	data.board.forEach(function(items){
+		items.forEach(function(item){
 			if( item.value ) {
 				var con        = document.querySelector("#con-"+item.lastY+"-"+item.lastX);
 				con.style.left = (cellWidth+cellSpace)*item.nextX+cellSpace+"px";
 				con.style.top  = (cellWidth+cellSpace)*item.nextY+cellSpace+"px";
-				if( item.lastValue1){
+				if(item.lastValue1){
 					var con1        = document.querySelector("#con-"+item.lastY1+"-"+item.lastX1);
 					con1.style.left = (cellWidth+cellSpace)*item.nextX+cellSpace+"px";
 					con1.style.top  = (cellWidth+cellSpace)*item.nextY+cellSpace+"px";
 				}
 			}
-		}
-	}
+		})
+	})
 	
 	setTimeout(function(){
 		updateView();
@@ -525,12 +495,13 @@ function undo(){
 	document.querySelector("#con-"+y+"-"+x).style.transform = "scale(0,0)";
 
 	setTimeout(function(){
-		document.getElementById('cons-block').removeChild(document.querySelector("#con-"+y+"-"+x));}, 150);
+		document.getElementById('cons-block').removeChild(document.querySelector("#con-"+y+"-"+x));
+	}, 150);
 
 	var	cons = document.createDocumentFragment();
 	for (var i = 0; i < 4; i++) {
 		for (var j = 0; j < 4; j++) {
-			if( data.board[i][j].value){
+			if(data.board[i][j].value){
 				item = data.board[i][j];
 				item.nextX = item.lastX;
 				item.nextY = item.lastY;
@@ -544,16 +515,7 @@ function undo(){
 				con.setAttribute("id", "con-"+item.nextY+"-"+item.nextX);
 
 				if(item.lastValue1) {
-					var con1 = document.createElement("div");
-					con1.setAttribute("class", "cell con");
-					con1.setAttribute("id", "con-"+item.lastY1+"-"+item.lastX1);
-					con1.style.top = (cellWidth+cellSpace)*i+cellSpace+"px";
-					con1.style.left = (cellSpace+cellWidth)*j+cellSpace+"px";
-					con1.style.width = cellWidth+"px";
-					con1.style.height = cellWidth+"px";
-					con1.style.lineHeight = cellWidth+"px";
-					con1.style.backgroundColor = numberBgColor(item.lastValue1);
-					con1.textContent = item.lastValue1;
+					var con1 = createCell(i, j, item.lastValue1, item.lastY1, item.lastX1);
 					cons.appendChild(con1);
 				}
 			}
@@ -562,14 +524,12 @@ function undo(){
 	document.getElementById('cons-block').appendChild(cons);
 
 	data.score = data.preScore;
+	updateScore();
 
 	setTimeout(function(){
-		var item;
-		for(var i=0; i<4; i++){
-			for(var j=0; j<4; j++){
-				item = data.board[i][j];
-
-				if( document.querySelector("#con-"+i+"-"+j)){
+		data.board.forEach(function(items, i){
+			items.forEach(function(item, j){
+				if(document.querySelector("#con-"+i+"-"+j)){
 					document.querySelector("#con-"+i+"-"+j).style.top=(cellSpace+cellWidth)*i+cellSpace+"px";
 					document.querySelector("#con-"+i+"-"+j).style.left=(cellSpace+cellWidth)*j+cellSpace+"px";
 					
@@ -584,11 +544,28 @@ function undo(){
 					item.nextX = -1;
 					item.nextY = -1;
 				}
-			}
-		}
-		updateScore();
+			})
+		})
+		
 	}, 150);
 	
+}
+
+function createCell(i, j, value, y, x){
+		var con = document.createElement("div");
+		con.setAttribute("class", "cell con");
+		con.setAttribute("id", "con-"+y+"-"+x);
+		con.style.top = cellSpace*(i+1)+cellWidth*i+"px";
+		con.style.left = cellSpace*(j+1)+cellWidth*j+"px";
+		con.style.width = cellWidth+"px";
+		con.style.height = cellWidth+"px";
+		con.style.lineHeight = cellWidth+"px";
+		con.style.backgroundColor = numberBgColor(value);
+		if(value>1000){
+			con.style.fontSize = cellWidth>100?"40px":"30px";
+		}
+		con.textContent = value;
+		return con;
 }
 
 function getLocalBoard() {
